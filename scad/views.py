@@ -65,7 +65,7 @@ def index(request):
 				update_creator_join_group_sql = "UPDATE user SET created_achieve=1,join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 				cursor.execute(update_creator_join_group_sql)
 		
-			return HttpResponseRedirect('/group/{}'.format(group_id))
+				return HttpResponseRedirect('/group/{}'.format(group_id))
 			
 			else:
 				#handle no this user's id in database
@@ -73,20 +73,20 @@ def index(request):
 
 		# login
 		elif 'user_id' in request.POST:
-		id = request.POST['user_id']
-		email = request.POST['user_email']
-		name = request.POST['user_name']
-		cursor = connection.cursor()
-		selectsql = "SELECT * FROM user WHERE user_id = '%s'" %(id)
-		cursor.execute(selectsql)
-		user_data = cursor.fetchall()
-		cursor2 = connection.cursor()
-		if len(user_data) == 0:
-			insertsql = "INSERT INTO user(name,user_id,email,login_cnt) VALUES ('%s','%s','%s',1)" %(name,id,email)
-			cursor2.execute(insertsql)
-		else:
-			updatesql = "UPDATE user SET login_cnt = login_cnt + 1 WHERE user_id = '%s'" % (id)
-			cursor2.execute(updatesql)
+			id = request.POST['user_id']
+			email = request.POST['user_email']
+			name = request.POST['user_name']
+			cursor = connection.cursor()
+			selectsql = "SELECT * FROM user WHERE user_id = '%s'" %(id)
+			cursor.execute(selectsql)
+			user_data = cursor.fetchall()
+			cursor2 = connection.cursor()
+			if len(user_data) == 0:
+				insertsql = "INSERT INTO user(name,user_id,email,login_cnt) VALUES ('%s','%s','%s',1)" %(name,id,email)
+				cursor2.execute(insertsql)
+			else:
+				updatesql = "UPDATE user SET login_cnt = login_cnt + 1 WHERE user_id = '%s'" % (id)
+				cursor2.execute(updatesql)
 			return HttpResponseRedirect("/")
 	
 	if request.method == 'GET':
@@ -112,7 +112,7 @@ def index(request):
 
 
 @csrf_exempt
-def group_page(request,group_id):
+def group(request,group_id):
 	if request.method == 'GET':
 		cursor = connection.cursor()
 		selectsql = "SELECT * FROM study_group WHERE group_id = '%s'" %(group_id)
@@ -174,7 +174,7 @@ def group_page(request,group_id):
 			return HttpResponseRedirect('/group/{}'.format(group_id))
 
 
-def user_page(request,user_id):
+def user(request,user_id):
 	
 	cursor = connection.cursor()
 	selectsql = "SELECT join_group FROM user WHERE user_id = '%s'" %(user_id)

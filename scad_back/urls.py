@@ -15,8 +15,8 @@ from scad.views import post_group_news
 urlpatterns = [
 			   url(r'^admin/', include(admin.site.urls)),
 			   url(r'^$', index),
-			   url(r'^group/(?P<group_id>[0-9]+)/$',group_page),
-			   url(r'^user/(?P<user_id>[0-9]+)/$',user_page),
+			   url(r'^group/(?P<group_id>[0-9]+)/$',group),
+			   url(r'^user/(?P<user_id>[0-9]+)/$',user),
 			   url(r'^group/(?P<group_id>[0-9]+)/member_inf/$',group_member_inf),
 			   url(r'^userno/(?P<user_id>[0-9]+)/$',userno),
 			   url(r'^group/(?P<group_id>[0-9]+)/calendar/$',getcalendarevent),
