@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<header id="about-us" align="center" type="hidden">
+	<div class="header-mask"></div>
+	<br class="space">
+	<br class="space">
+	<div class="header-slogan center">
+		<h1>Work Hard And Play Hard</h1>
+		<hr>
+		<!-- TODO: text font size and arrow size -->
+		<p>We come up with an idea that will help you and your group members to engage in learning together. We provide a platform you can invite your friends or meet someone you do not know to join the study groups and share the same interests. There are some factors related to gamification such as achievement badges, ranking and levels.</p>
+	</div>
+	
+	<button class="btn btn-success" onclick="checkLoginState();">Login with FB</button>
+	<!--div class="fb-login-button" data-max-rows="1" data-size="xlarge" data-show-faces="false" data-auto-logout-link="false" scope="user_profile,email" ></div-->
+	<div class="arrow-down center" style="margin-top: 24px;">
+		<i class="material-icons">keyboard_arrow_down</i></br>
+		<i class="material-icons" style="margin-top: -20px;">keyboard_arrow_down</i>
+	</div>
+</header>
+
+<!-- Container -->
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			<h2>Recommended Groups</h2>
+			<br class="space">
+		</div>
+		
+		<!-- TODO: creator name + member number-->
+		{% if group_data %}
+		{% for group in group_data %}
+		{% if group.private == 0 %}
+		<div class="col-md-4">
+			<div class="panel panel-warning">
+				<div class="panel-heading">
+					<a href="/group/{{ group.group_id }}/">
+						<div><h4 align="center">{{ group.group_name }}</h4></div>
+					</a>
+				</div>
+				<div class="panel-body">
+					<p align="center">{{ group.intro }}</p>
+					<hr>
+					<p>
+					Period: {{ group.created_time }} ~ {{ group.finished_time }}<br>
+					Member: {{ group.member_num }} / {{ group.member_limit }}<br>
+					Creator: {{ group.creator }}
+					</p>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+		{% endfor %}
+		{% endif %}
+		
+	</div>
+</div>
+
+
+<!--button onclick="test();">Test Button</button>
+ <script>
+ function test() {
+ $('body').css('padding-top', '70px');
+ $('#about-us').hide();
+ $('#navbar-button').show();
+ $('#create_group_button').show();
+ $('#NavBar').css('background-color', 'black');
+ $('a.navbar-brand').css('color', '#dddddd');
+ }
+ </script-->
+
+
+{% endblock %}
