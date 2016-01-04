@@ -64,8 +64,8 @@ def index(request):
 				# insert the group no to the user
 				update_creator_join_group_sql = "UPDATE user SET created_achieve=1,join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 				cursor.execute(update_creator_join_group_sql)
-		
 				return HttpResponseRedirect('/group/{}'.format(group_id))
+
 			
 			else:
 				#handle no this user's id in database
