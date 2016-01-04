@@ -1,0 +1,109 @@
+@charset "UTF-8";
+/*! normalize.css v3.0.1 | MIT License | git.io/normalize */
+/* line 22, ../sass/styles.scss */
+#main-text {
+  color: #dddddd;
+  font-size: 64px;
+  text-align: center;
+}
+
+/* line 32, ../sass/styles.scss */
+.space {
+  height: 200px;
+}
+
+/* line 40, ../sass/styles.scss */
+.photos-padding {
+  margin-top: -21px;
+  background-color: #011C28;
+  height: 21px;
+}
+
+/* line 46, ../sass/styles.scss */
+.modal-footer {
+  word-wrap: break-word;
+}
+
+/* line 50, ../sass/styles.scss */
+.thumbnail {
+  overflow: hidden;
+  padding: 0px;
+  border: 0px solid #fff;
+  background-color: transparent;
+}
+
+/* line 57, ../sass/styles.scss */
+.image-container {
+  background-color: #011C28;
+  overflow: auto;
+}
+
+/* line 62, ../sass/styles.scss */
+.thumbnail > img, .thumbnail a > img {
+  max-width: none;
+  max-height: 200px;
+}
+
+body {
+	background-image: url("../images/bg.png");
+	height: 100%;
+	padding-top: 30px;
+	padding-bottom: 70px;
+	font-size:14px;
+}
+
+footer {
+	background-color: #000;
+	padding-top: 15px;
+}
+
+/* Header */
+header {
+    /*min-height: 700px;*/
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.exp {
+  width: 90%;
+  height: 18px;
+  margin: 0 auto;
+  text-align: right;
+}
+
+#user_exp  {
+  width: 250px;
+  height: 18px;
+  float: right;
+  margin: 0px 20px;
+  /*background-color: #00995c;*/
+}
+
+#myContent {
+	font-size: 16px;
+}
+
+#calendar {
+  width: inherit;
+  margin: auto;
+}
+
+#editor {
+	display:block;
+	margin:0 0 10px;
+	padding:6px;
+	width:95%;
+	background:#FFF;
+	border:#AAA 1px solid;
+	font-size:13px;
+}
+textarea#editor, div#editor, span#editor{
+	min-height:100px;
+}
+
+.news_content {
+  text-align: center;
+  display: none;
+
+}

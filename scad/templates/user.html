@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html" xmlns:https="http://www.w3.org/1999/xhtml">
+    <head>
+		<meta charset="utf-8">
+        <title>Study Group</title>
+        {% load static %}
+	    <link href="{% static 'stylesheets/jquery-ui.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'stylesheets/bootstrap.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'stylesheets/user.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'stylesheets/simple-sidebar.css' %}" rel="stylesheet" type="text/css">
+        <script src="{% static 'javascript/js_cookie.js'  %}"></script>
+        <script src="{% static 'javascript/jquery.js' %}"></script>
+	    <script src="{% static 'javascript/jquery-ui.js' %}"></script>
+        <script src="{% static 'javascript/bootstrap.js' %}"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+              showGroup();
+            });
+            function creategroup_submit() {
+	            check_group_name = $('#group_name').val();
+	            check_group_intro = $('#intro').val();
+	            check_time = $('#finished_time_date').val();
+	            nosubmit = 0;
+	            if(check_time == '') {
+		            $('#finished_time_date').attr('style','border: 1px solid red');
+		            nosubmit =1;
+	            } else {
+		            $('#finished_time_date').removeAttr('style');
+	            }
+	            if(check_group_intro =='') {
+		            $('#introdiv').attr('class','form-group has-error');
+		            nosubmit =1;
+	            } else {
+		            $('#introdiv').attr('class','form-group');
+	            }
+	            if(check_group_name=='') {
+		            $('#namediv').attr('class','form-group has-error');
+		            nosubmit =1;
+	            } else {
+		            $('#namediv').attr('class','form-group');
+	            }
+	            if(nosubmit==1)return false;
+
+	            creator_id = Cookies.get('user_id');
+	            group_name = document.getElementById("group_name").value;
+	            intro = document.getElementById("intro").value;
+	            finished_time = document.getElementById("finished_time_date").value;
+
+	            if(document.getElementById("private_op1").checked) {
+		            private = 0;
+	            } else {
+		            private = 1;
+	            }
+
+	            date = Date.now();
+	            group_id = creator_id + date;
+	            member_limit = parseInt(document.getElementsByName("member_limit")[0].value);
+	            $.post( "/index/", { group_id : group_id, group_name : group_name,  member_limit :member_limit,intro:intro,private:private,creator_id:creator_id ,finished_time:finished_time})
+			            .then(function () {
+				            window.location = '/group/'+group_id;
+			            });
+            }
+            function logout() {
+	            Cookies.remove('user_id');
+	            window.location = '/index/';
+            }
+            function showGroup() {
+                $('#myContent').empty();
+                {% if user_page_data %}
+	                var groups = '';
+                    {% for page_data in user_page_data %}
+	                    // calculate progress
+	                    var ct = new Date({{ page_data.created_time }});
+						var ft = new Date({{  page_data.finish_time }});
+						var nt = new Date();
+	                    var alltime = ((ft - ct) / (1000 * 60 * 60 * 24));
+	                    var perc = Math.floor(((nt - ct) / (1000 * 60 * 60 * 24))) / alltime;
+	                    if(alltime == 0)
+		                    perc = 100;
+
+
+	                    var img = '<img src="{% static "images/logo.jpg" %}" class="group_img col-md-2"></img>';
+                        var name = '<a href="/group/{{ page_data.group_id }}" class="col-md-10"><h4 align="center">{{ page_data.group_name }}</h4></a>';
+                        var info = '<p align="center">{{ page_data.intro }}</p>';
+						var progress = '<div class="progress"><div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: ' + perc + '%"></div></div>'
+	                    groups += '<div class="list-group-item row">' + img + name + info + progress + '</div>';
+
+                    {% endfor %}
+	                $('#myContent').append('<div class="list-group">' + groups + '</div>');
+                {% endif %}
+            }
+
+            function showAchievement() {
+                $('#myContent').empty();
+
+                var div = $('<div/>', {
+                    'class': 'login_achievement'
+                }).html('<h4>Login Achievement</h4>');
+
+                var img = $('<img/>', {
+                    'class': 'achievement',
+                    src: '{% static "images/logo.jpg" %}',
+                    width: 150
+                }).appendTo(div);
+
+                var img = $('<img/>', {
+                    'class': 'achievement',
+                    src: '{% static "images/logo.jpg" %}',
+                    width: 150
+                }).appendTo(div);
+
+                var img = $('<img/>', {
+                    'class': 'achievement',
+                    src: '{% static "images/logo.jpg" %}',
+                    width: 150
+                }).appendTo(div);
+
+                var img = $('<img/>', {
+                    'class': 'achievement',
+                    src: '{% static "images/logo.jpg" %}',
+                    width: 150
+                }).appendTo(div);
+
+                $('#myContent').append(div);
+            }
+
+        function showMission() {
+	        $('#myContent').empty();
+			// TODO:
+        }
+
+        function showMailbox() {
+	        $('#myContent').empty();
+	        // TODO:
+        }
+
+        </script>
+    </head>
+    <body>
+
+        <!-- Navigation Bar -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" id="NavBar">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a href="/index/" class="navbar-brand" style="color: #ddd; border: #000 1px;"><b>Study Group</b></a>
+                </div>
+				<div class="collapse navbar-collapse">
+
+					<ul class="nav navbar-nav navbar-right navtabs">
+						<li role="presentation" class="active"><a href="#">My Information</a></li>
+						<li role="presentation"><a href="#" onclick="logout();">Log Out</a></li>
+					</ul>
+					<button type="button" class="btn btn-primary navbar-btn navbar-right" id="create_group_button" data-toggle="modal" data-target="#create_group_Modal">Create Group</button>
+
+				</div>
+            </div>
+        </nav>
+
+        <header>
+	        <div class="exp">
+                <b>LV.20</b>
+                <div id="user_exp">
+	                <div class="progress">
+		                <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width:70%">
+                            <span class="sr-only">70% Complete</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <br class="space">
+
+        <div id="wrapper" style="width: 95%" align="center">
+	        <!-- Sidebar Wrapper -->
+	        <div id="sidebar-wrapper" style="background: transparent;">
+	            <ul type="none">
+		            <h3><li><a href='#' class='myLink' onclick="showGroup()">My Group</a></li></h3>
+		            <h3><li><a href="#" class="myLink" onclick="showMission()">Mission</a></li></h3>
+		            <h3><li><a href='#' class='myLink' onclick="showAchievement()">Achievement</a></li></h3>
+		            <h3><li><a href="#" class="myLink" onclick="showMailbox()">MailBox</a></li></h3>
+	            </ul>
+	        </div>
+	        <div id="page-content-wrapper" style="width: 100%">
+		        <!-- Container -->
+		        <div class="container-fluid row">
+			        <div id="myContent"></div>
+		        </div>
+	        </div>
+        </div>
+
+        <!-- Modal -->
+		<div id="create_group_Modal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<div id="namediv">
+							<h4 class="modal-title">Group Name</h4>
+							<input type="text" class="form-control" name="group_name" id="group_name" placeholder="要將讀書會取作什麼呢？">
+								</div>
+					</div>
+					<div class="modal-body">
+						<div id="introdiv">
+							<label>Introduction</label>
+							<textarea class="form-control" name="intro" id="intro" rows="3"></textarea>
+							<hr>
+						</div>
+						<div class="row">
+							<div class="col-md-4 col-md-offset-2">
+								<label>隱私性</label>
+								<div class="radio">
+									<input type="radio" name="private" id="private_op1"  value="0" checked>public
+									</br>
+									<input type="radio" name="private" id="private_op2"  value="1">private
+								</div>
+							</div>
+							<div id="timediv" class="col-md-4">
+								<label>結束時間</label>
+								<div>
+									<input id="finished_time_date" type="date">
+								</div>
+							</div>
+						</div>
+
+						<div id="clear" style="clear: both"></div>
+
+						<hr>
+						<div id="member_limitdiv">
+							<fieldset>
+								<label for="sel1">人數上限 (0為無限制)</label>
+								<select name="member_limit" class="form-control" id="sel1">
+									<option>0</option>
+									<option>5</option>
+									<option>10</option>
+									<option>15</option>
+									<option>20</option>
+								</select>
+							</fieldset>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="creategroup_submit()">Create</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <nav class="navbar navbar-inverse navbar-fixed-bottom" >
+			<ul>
+		        <li class="copyright" type="none" align="center" style="color: #eee;vertical-align:middle;">Copyright © 2015 Study Group ALL Rights Reserved.</li>
+	        </ul>
+        </nav>
+
+        <!--footer>
+	        <ul>
+		        <li class="copyright" type="none" align="center" style="color: #eee;vertical-align:middle;">Copyright © 2015 Study Group ALL Rights Reserved.</li>
+	        </ul>
+	        <br clear="space">
+        </footer-->
+
+    </body>
+</html>

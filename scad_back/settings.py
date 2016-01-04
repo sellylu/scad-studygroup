@@ -13,6 +13,9 @@ import os
 import dj_database_url
 
 
+ALLOWED_HOSTS = []
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -80,7 +83,15 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    },
+		'scad': {
+		'ENGINE': 'django.db.backends.mysql',
+		'NAME': 'scad',
+		'USER': 'scad',
+		'PASSWORD': 'scad',
+		'HOST': '140.114.194.9',
+		'PORT': '3306',
+	}
 }
 
 # Internationalization
