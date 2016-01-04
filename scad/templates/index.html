@@ -2,47 +2,74 @@
 {% load staticfiles %}
 
 {% block content %}
+<header id="about-us" align="center" type="hidden">
+	<div class="header-mask"></div>
+	<br class="space">
+	<br class="space">
+	<div class="header-slogan center">
+		<h1>Work Hard And Play Hard</h1>
+		<hr>
+		<!-- TODO: text font size and arrow size -->
+		<p>We come up with an idea that will help you and your group members to engage in learning together. We provide a platform you can invite your friends or meet someone you do not know to join the study groups and share the same interests. There are some factors related to gamification such as achievement badges, ranking and levels.</p>
+	</div>
+	
+	<button class="btn btn-success" onclick="checkLoginState();">Login with FB</button>
+	<!--div class="fb-login-button" data-max-rows="1" data-size="xlarge" data-show-faces="false" data-auto-logout-link="false" scope="user_profile,email" ></div-->
+	<div class="arrow-down center" style="margin-top: 24px;">
+		<i class="material-icons">keyboard_arrow_down</i></br>
+		<i class="material-icons" style="margin-top: -20px;">keyboard_arrow_down</i>
+	</div>
+</header>
 
-<div class="jumbotron text-center">
-  <div class="container">
-    <a href="/" class="lang-logo">
-      <img src="{% static 'lang-logo.png'%}">
-    </a>
-    <h1>Getting Started with Python on Heroku</h1>
-    <p>This is a sample Python application deployed to Heroku. It's a reasonably simple app - but a good foundation for understanding how to get the most out of the Heroku platform.</p>
-    <a type="button" class="btn btn-lg btn-default" href="https://devcenter.heroku.com/articles/getting-started-with-python"><span class="glyphicon glyphicon-flash"></span> Getting Started with Python</a>
-    <a type="button" class="btn btn-lg btn-primary" href="https://github.com/heroku/python-getting-started"><span class="glyphicon glyphicon-download"></span> Source on GitHub</a>
-  </div>
-</div>
+<!-- Container -->
 <div class="container">
-  <div class="alert alert-info text-center" role="alert">
-    To deploy your own copy, and learn the fundamentals of the Heroku platform, head over to the <a href="https://devcenter.heroku.com/articles/getting-started-with-python" class="alert-link">Getting Started with Python on Heroku</a> tutorial.
-  </div>
-  <hr>
-  <div class="row">
-    <div class="col-md-6">
-      <h3><span class="glyphicon glyphicon-info-sign"></span> How this sample app works</h3>
-      <ul>
-        <li>This app was deployed to Heroku, either using Git or by using <a href="https://github.com/heroku/python-getting-started">Heroku Button</a> on the repository.</li>
-
-        <li>When Heroku received the source code, it grabbed all the dependencies in the <a href="https://github.com/heroku/python-getting-started/blob/master/requirements.txt">requirements.txt file</a>.</li>
-        <li>The platform then spins up a dyno, a lightweight container that provides an isolated environment in which the slug can be mounted and executed.</li>
-        <li>You can scale your app, manage it, and deploy over <a href="https://addons.heroku.com/">150 add-on services</a>, from the Dashboard or CLI.</li>
-        <li>Check out the <a href="https://devcenter.heroku.com/articles/getting-started-with-python">Getting Started</a> guide to learn more!</li>
-      </ul>
-    </div>
-    <div class="col-md-6">
-      <h3><span class="glyphicon glyphicon-link"></span> Helpful Links</h3>
-      <ul>
-        <li><a href="https://www.heroku.com/home">Heroku</a></li>
-        <li><a href="https://devcenter.heroku.com/">Heroku Dev Center</a></li>
-        <li><a href="https://devcenter.heroku.com/articles/getting-started-with-python">Getting Started with Python on Heroku</a></li>
-        <li><a href="https://devcenter.heroku.com/articles/django-app-configuration">Configuring Django Apps for Heroku</a></li>
-      </ul>
-    </div>
-  </div> <!-- row -->
-   <div class="alert alert-info text-center" role="alert">
-    Please do work through the Getting Started guide, even if you do know how to build such an application.  The guide covers the basics of working with Heroku, and will familiarize you with all the concepts you need in order to build and deploy your own apps.
-  </div>
+	<div class="row">
+		<div class="col-md-12">
+			<h2>Recommended Groups</h2>
+			<br class="space">
+		</div>
+		
+		<!-- TODO: creator name + member number-->
+		{% if group_data %}
+		{% for group in group_data %}
+		{% if group.private == 0 %}
+		<div class="col-md-4">
+			<div class="panel panel-warning">
+				<div class="panel-heading">
+					<a href="/group/{{ group.group_id }}/">
+						<div><h4 align="center">{{ group.group_name }}</h4></div>
+					</a>
+				</div>
+				<div class="panel-body">
+					<p align="center">{{ group.intro }}</p>
+					<hr>
+					<p>
+					Period: {{ group.created_time }} ~ {{ group.finished_time }}<br>
+					Member: {{ group.member_num }} / {{ group.member_limit }}<br>
+					Creator: {{ group.creator }}
+					</p>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+		{% endfor %}
+		{% endif %}
+		
+	</div>
 </div>
+
+
+<!--button onclick="test();">Test Button</button>
+ <script>
+ function test() {
+ $('body').css('padding-top', '70px');
+ $('#about-us').hide();
+ $('#navbar-button').show();
+ $('#create_group_button').show();
+ $('#NavBar').css('background-color', 'black');
+ $('a.navbar-brand').css('color', '#dddddd');
+ }
+ </script-->
+
+
 {% endblock %}

@@ -2,8 +2,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 from scad.views import index
-from scad.views import group_page
-from scad.views import user_page
+from scad.views import group
+from scad.views import user
 from scad.views import group_member_inf
 from scad.views import userno
 from scad.views import getcalendarevent
