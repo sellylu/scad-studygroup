@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% block content %}
         {% if group_page_data %}
 	        {% csrf_token %}
 	        <div id="wrapper">
@@ -77,3 +78,4 @@ function flicker(){//閃爍函數
 				</div>
 			</div>
 		</div>
+{% endblock %}
