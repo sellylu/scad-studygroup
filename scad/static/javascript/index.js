@@ -7,14 +7,7 @@ function checkShowLoginDiv() {
 	if(user_id != undefined)
 		adjustCSS();
 }
-/*function closecal(){
-    $("#finished_time_date").attr('disabled','disabled');
-}
 
-function opencal(){
-$("#finished_time_date").removeAttr('disabled');
-}
-*/
 function creategroup_submit() {
     check_group_name = $('#group_name').val();
     check_group_intro = $('#intro').val();
@@ -95,7 +88,7 @@ function adjustCSS() {
  var js, fjs = d.getElementsByTagName(s)[0];
  if (d.getElementById(id)) {return;}
  js = d.createElement(s); js.id = id;
- js.src = "http://connect.facebook.net/en_US/sdk.js";
+ js.src = "//connect.facebook.net/en_US/sdk.js";
  fjs.parentNode.insertBefore(js, fjs);
  }(document, 'script', 'facebook-jssdk'));
 
