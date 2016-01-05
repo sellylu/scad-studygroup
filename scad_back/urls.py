@@ -27,5 +27,5 @@ urlpatterns = [
 			   url(r'^post_group_news/(?P<group_id>[0-9]+)/$',post_group_news),
 			   url(r'^static/(?P<path>.*)$', views.serve),
 			   ]
-
+ 
 urlpatterns += staticfiles_urlpatterns()
