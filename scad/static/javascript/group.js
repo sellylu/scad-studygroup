@@ -3,8 +3,12 @@ $.ajaxSetup({
 });
 
 $(document).ready(function() {
-// page is now ready, initialize the calendar...
-});
+				  checkShowLoginDiv();
+				  setuser_no();
+				  checkShowAddButton('{{group_page_data.group_member}}');
+				  showprogress('{{group_page_data.created_time}}','{{ group_page_data.finished_time}}');
+				  showNews('{{group_page_data.group_id}}')
+				  });
 
 function checkShowLoginDiv() {
     user_id = Cookies.get('user_id');

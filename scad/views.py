@@ -28,7 +28,7 @@ def index(request):
 		if 'group_name' in request.POST:
 			creator = request.POST['creator_id']
 			cursor = connection.cursor()
-			selectsql = "SELECT * FROM user WHERE user_id = '%s'" %(creator)
+			selectsql = "SELECT * FROM scad_user WHERE user_id = '%s'" %(creator)
 			cursor.execute(selectsql)
 			user_data = cursor.fetchone()
 			
@@ -77,7 +77,7 @@ def index(request):
 			email = request.POST['user_email']
 			name = request.POST['user_name']
 			cursor = connection.cursor()
-			selectsql = "SELECT * FROM user WHERE user_id = '%s'" %(id)
+			selectsql = "SELECT * FROM scad_user WHERE user_id = '%s'" %(id)
 			cursor.execute(selectsql)
 			user_data = cursor.fetchall()
 			cursor2 = connection.cursor()
@@ -147,7 +147,7 @@ def group(request,group_id):
 			cursor.execute(getgroupnosql)
 			group_no = cursor.fetchone()[0]
 			
-			getjoin_group = "SELECT join_group FROM user WHERE user_id = '%s'" % (join_id)
+			getjoin_group = "SELECT join_group FROM scad_user WHERE user_id = '%s'" % (join_id)
 			cursor.execute(getjoin_group)
 			join_g = cursor.fetchone()[0]
 			
@@ -160,7 +160,7 @@ def group(request,group_id):
 			cursor.execute(getgroup_member)
 			g_member = cursor.fetchone()[0]
 			
-			getuserno = "SELECT no FROM user WHERE user_id = '%s'" % (join_id)
+			getuserno = "SELECT no FROM scad_user WHERE user_id = '%s'" % (join_id)
 			cursor.execute(getuserno)
 			user_no = cursor.fetchone()[0]
 			
@@ -177,7 +177,7 @@ def group(request,group_id):
 def user(request,user_id):
 	
 	cursor = connection.cursor()
-	selectsql = "SELECT join_group FROM user WHERE user_id = '%s'" %(user_id)
+	selectsql = "SELECT join_group FROM scad_user WHERE user_id = '%s'" %(user_id)
 	cursor.execute(selectsql)
 	user_group = cursor.fetchone()[0][:-1]
 	
@@ -208,7 +208,7 @@ def group_member_inf(request,group_id):
 	group_member_data = data.split(',')
 	user_inf = []
 	for member in group_member_data:
-		getuserinfsql = "SELECT name,email FROM user WHERE no = '%d'" %(int(member))
+		getuserinfsql = "SELECT name,email FROM scad_user WHERE no = '%d'" %(int(member))
 		cursor.execute(getuserinfsql)
 		tmp = cursor.fetchone()
 		user_inf.extend(list(tmp))
@@ -218,7 +218,7 @@ def group_member_inf(request,group_id):
 def userno(request,user_id):
 	
 	cursor = connection.cursor()
-	getuserno = "SELECT no FROM user WHERE user_id ='%s'" % (user_id);
+	getuserno = "SELECT no FROM scad_user WHERE user_id ='%s'" % (user_id);
 	cursor.execute(getuserno)
 	data = cursor.fetchone()[0]
 	return HttpResponse(data)

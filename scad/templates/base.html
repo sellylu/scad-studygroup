@@ -12,6 +12,31 @@
 		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"/>
+		
+		{% load static %}
+		<script src="{% static 'javascript/js_cookie.js' %}"></script>
+		<script src="{% static 'javascript/index.js' %}"></script>
+		<script src="{% static 'javascript/group.js' %}"></script>
+		<script src="{% static 'javascript/fullcalendar.js' %}"></script>
+		<script src="{% static 'javascript/moment.min.js' %}"></script>
+
+		<link href="{% static 'stylesheets/index.css' %}" rel="stylesheet" type="text/css"/>
+		<link href="{% static 'stylesheets/group.css' %}" rel="stylesheet" type="text/css">
+		<link href="{% static 'stylesheets/fullcalendar.css' %}" rel="stylesheet" type="text/css">
+		<link href="{% static 'stylesheets/simple-sidebar.css' %}" rel="stylesheet">
+
+		<script>
+			$(document).ready(function() {
+							  checkShowLoginDiv();
+							  if(windows.location.pathname.split("/")[0] == "group") {
+							  setuser_no();
+							  checkShowAddButton('{{group_page_data.group_member}}');
+							  showprogress('{{group_page_data.created_time}}','{{ group_page_data.finished_time}}');
+							  showNews('{{group_page_data.group_id}}');
+							  }
+							  });
+		</script>
+
 
 	</head>
 	<body onload="checkShowLoginDiv();">
