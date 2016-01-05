@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-
+from django.contrib.staticfiles import views
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from scad.views import index
 from scad.views import group
 from scad.views import user
@@ -24,4 +25,7 @@ urlpatterns = [
 			   url(r'^deletecalendarevent/(?P<group_id>[0-9]+)/$',deletecalendarevent),
 			   url(r'^get_group_news/(?P<group_id>[0-9]+)/$',get_group_news),
 			   url(r'^post_group_news/(?P<group_id>[0-9]+)/$',post_group_news),
+			   url(r'^static/(?P<path>.*)$', views.serve),
 			   ]
+
+urlpatterns += staticfiles_urlpatterns()
