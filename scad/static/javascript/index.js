@@ -51,7 +51,7 @@ function creategroup_submit() {
     }
     date = Date.now();
     group_id = creator_id + date;
-    $.post( "/index/", { group_id : group_id, group_name : group_name,  member_limit :member_limit,intro:intro,private:private,creator_id:creator_id ,finished_time:finished_time})
+    $.post( "/", { group_id : group_id, group_name : group_name,  member_limit :member_limit,intro:intro,private:private,creator_id:creator_id ,finished_time:finished_time})
         .then(function () {
             window.location = '/group/'+group_id;
         });
@@ -63,7 +63,7 @@ function getMyInfoURL(){
 }
 function logout(){
 	Cookies.remove('user_id');
-	window.location = '/index/';
+	window.location = '/';
 }
 
 function saveUserInfo() {
@@ -71,7 +71,7 @@ function saveUserInfo() {
 	FB.api('/me',{"fields": "name, email"}, function(response) {
 		   if(response && !response.error) {
 
-               $.post("/index/",{
+               $.post("/",{
                    user_id : response.id, user_name: response.name, user_email: response.email})
                    .then(function(){
 						 adjustCSS();
@@ -130,7 +130,7 @@ function statusChangeCallback(response) {
 
 window.fbAsyncInit = function() {
     FB.init({
-            appId      : '444916912380076',
+            appId      : '903468286374795',
 			cookie     : true,
             xfbml      : true,
             version    : 'v2.5'
