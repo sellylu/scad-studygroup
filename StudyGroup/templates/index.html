@@ -77,7 +77,7 @@
 				<!-- TODO: creator name + member number-->
 				{% if group_data %}
 					{% for group in group_data %}
-						{% if group.private == 0 %}
+						{% if group.private %}
 						<div class="col-md-4">
 							<div class="panel panel-warning">
 								<div class="panel-heading">

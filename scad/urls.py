@@ -17,6 +17,8 @@ from StudyGroup.views import post_group_materials
 from StudyGroup.views import send_mail
 from StudyGroup.views import get_mail
 from StudyGroup.views import get_mission
+from StudyGroup.views import get_group_thoughts
+from StudyGroup.views import post_group_thoughts
 
 urlpatterns = [
 	url(r'^admin/', include(admin.site.urls)),
@@ -36,6 +38,8 @@ urlpatterns = [
 	url(r'^send_mail/(?P<group_id>[0-9]+)/$',send_mail),
 	url(r'^get_mail/(?P<user_id>[0-9]+)/$',get_mail),
 	url(r'^get_mission/(?P<user_id>[0-9]+)/$',get_mission),
+	url(r'^get_group_thoughts/(?P<group_id>[0-9]+)/$',get_group_thoughts),
+	url(r'^post_group_thoughts/(?P<group_id>[0-9]+)/$',post_group_thoughts),
 ]
  
 urlpatterns += staticfiles_urlpatterns()

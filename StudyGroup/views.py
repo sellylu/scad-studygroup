@@ -16,7 +16,7 @@ def index(request):
 		if 'group_name' in request.POST:
 			creator = request.POST['creator_id']
 			cursor = connection.cursor()
-			selectsql = "SELECT * FROM user WHERE user_id = '%s'" %(creator)
+			selectsql = "SELECT * FROM scad_user WHERE user_id = '%s'" %(creator)
 			cursor.execute(selectsql)
 			user_data = cursor.fetchone()
 			
@@ -50,7 +50,7 @@ def index(request):
 				user_join_group = user_join_group + str(group_created_no[0]) + ','
 				
 				# insert the group no to the user
-				update_creator_join_group_sql = "UPDATE user SET created_achieve=1,join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+				update_creator_join_group_sql = "UPDATE scad_user SET created_achieve=1,join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 				cursor.execute(update_creator_join_group_sql)
 				return HttpResponseRedirect('/group/{}'.format(group_id))
 
@@ -66,7 +66,7 @@ def index(request):
 			name = request.POST['user_name']
 			pic = request.POST['user_pic']
 			cursor = connection.cursor()
-			selectsql = "SELECT * FROM user WHERE user_id = '%s';" %(id)
+			selectsql = "SELECT * FROM scad_user WHERE user_id = '%s';" %(id)
 			cursor.execute(selectsql)
 			user_data = cursor.fetchall()
 			cursor2 = connection.cursor()
@@ -74,7 +74,7 @@ def index(request):
 				insertsql = "INSERT INTO user(name,user_id,email,login_cnt,pic) VALUES ('%s','%s','%s',1,'%s')" %(name,id,email,pic)
 				cursor2.execute(insertsql)
 			else:
-				updatesql = "UPDATE user SET login_cnt = login_cnt + 1 WHERE user_id = '%s'" % (id)
+				updatesql = "UPDATE scad_user SET login_cnt = login_cnt + 1 WHERE user_id = '%s'" % (id)
 				cursor2.execute(updatesql)
 			return HttpResponseRedirect("/")
 	
@@ -136,20 +136,20 @@ def group(request,group_id):
 			cursor.execute(getgroupnosql)
 			group_no = cursor.fetchone()[0]
 			
-			getjoin_group = "SELECT join_group FROM user WHERE user_id = '%s'" % (join_id)
+			getjoin_group = "SELECT join_group FROM scad_user WHERE user_id = '%s'" % (join_id)
 			cursor.execute(getjoin_group)
 			join_g = cursor.fetchone()[0]
 			
 			joined_data = join_g + str(group_no) +','
 			
-			updatejoingroupsql = "UPDATE user SET join_group = '%s' WHERE user_id ='%s'" % (joined_data,join_id)
+			updatejoingroupsql = "UPDATE scad_user SET join_group = '%s' WHERE user_id ='%s'" % (joined_data,join_id)
 			cursor.execute(updatejoingroupsql)
 			
 			getgroup_member = "SELECT group_member FROM study_group WHERE group_id = '%s'" % (group_id)
 			cursor.execute(getgroup_member)
 			g_member = cursor.fetchone()[0]
 			
-			getuserno = "SELECT no FROM user WHERE user_id = '%s'" % (join_id)
+			getuserno = "SELECT no FROM scad_user WHERE user_id = '%s'" % (join_id)
 			cursor.execute(getuserno)
 			user_no = cursor.fetchone()[0]
 			
@@ -166,7 +166,7 @@ def group(request,group_id):
 def user(request,user_id):
 	
 	cursor = connection.cursor()
-	selectsql = "SELECT join_group FROM user WHERE user_id = '%s'" %(user_id)
+	selectsql = "SELECT join_group FROM scad_user WHERE user_id = '%s'" %(user_id)
 	cursor.execute(selectsql)
 	user_group = cursor.fetchone()[0][:-1]
 	
@@ -200,7 +200,7 @@ def group_member_inf(request,group_id):
 	group_member_data = data.split(',')
 	user_inf = ''
 	for member in group_member_data:
-		getuserinfsql = "SELECT name,email,pic FROM user WHERE no = '%d'" %(int(member))
+		getuserinfsql = "SELECT name,email,pic FROM scad_user WHERE no = '%d'" %(int(member))
 		cursor.execute(getuserinfsql)
 		tmp = cursor.fetchone()
 		user_inf = user_inf + tmp[0] + ',' + tmp[1] + ',' + tmp[2] + ';'
@@ -210,7 +210,7 @@ def group_member_inf(request,group_id):
 def userno(request,user_id):
 	
 	cursor = connection.cursor()
-	getuserno = "SELECT no FROM user WHERE user_id ='%s'" % (user_id);
+	getuserno = "SELECT no FROM scad_user WHERE user_id ='%s'" % (user_id);
 	cursor.execute(getuserno)
 	data = cursor.fetchone()[0]
 	return HttpResponse(data)
@@ -345,7 +345,7 @@ def send_mail(request,group_id):
 		group_member = tmp_member.split(',')
 
 		for member in group_member:
-			update_mail_sql = "UPDATE user SET mail = '%s' WHERE no = '%d' " %(no_str,int(member))
+			update_mail_sql = "UPDATE scad_user SET mail = '%s' WHERE no = '%d' " %(no_str,int(member))
 			cursor.execute(update_mail_sql)
 		return HttpResponseRedirect('/group/{}'.format(group_id))
 
@@ -353,7 +353,7 @@ def send_mail(request,group_id):
 def get_mail(request,user_id):
 
 	cursor = connection.cursor()
-	get_all_mail_no_sql = "SELECT mail FROM user WHERE user_id = '%s'" %(user_id)
+	get_all_mail_no_sql = "SELECT mail FROM scad_user WHERE user_id = '%s'" %(user_id)
 
 	cursor.execute(get_all_mail_no_sql)
 	all_mail_no = cursor.fetchone()[0][:-1]
@@ -372,7 +372,7 @@ def get_mail(request,user_id):
 
 def get_mission(request,user_id):
 
-	get_user_group_sql = "SELECT join_group FROM user WHERE user_id = '%s' " % (user_id)
+	get_user_group_sql = "SELECT join_group FROM scad_user WHERE user_id = '%s' " % (user_id)
 	cursor = connection.cursor()
 	cursor.execute(get_user_group_sql)
 	tmp_g = cursor.fetchone()[0][:-1]
@@ -392,7 +392,7 @@ def get_mission(request,user_id):
 
 		data = ''+group_name+'!'
 		for member in group_member:
-			get_user_name_pic_sql = "SELECT name,pic FROM user WHERE no ='%d'" %(int(member))
+			get_user_name_pic_sql = "SELECT name,pic FROM scad_user WHERE no ='%d'" %(int(member))
 			cursor.execute(get_user_name_pic_sql)
 			tmp_data = cursor.fetchone()
 			data = data + tmp_data[0] + ',' + tmp_data[1] + ';'
@@ -400,6 +400,30 @@ def get_mission(request,user_id):
 		return HttpResponse(data)
 	else:
 		return HttpResponse("fwe")
+
+def get_group_thoughts(request,group_id):
+
+	cursor = connection.cursor()
+	get_group_newssql = "SELECT * FROM thought WHERE group_id ='%s' ORDER BY no DESC" % (group_id);
+	cursor.execute(get_group_newssql)
+	data = cursor.fetchall()
+	news_str = ''
+	for news in data:
+		news_str = news_str + news[2]+',' +news[3] + ';'
+	return HttpResponse(news_str)
+
+
+@csrf_exempt
+def post_group_thoughts(request,group_id):
+
+	content = request.POST['content']
+	t = time.time()
+	date = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d')
+	cursor = connection.cursor()
+	content = strcheck(content)
+	post_group_newssql = "INSERT INTO thought(group_id,content,created_time) VALUES('%s','%s','%s')" % (group_id,content,date);
+	cursor.execute(post_group_newssql)
+	return HttpResponseRedirect('/group/{}'.format(group_id))
 
 
 def strcheck(string):

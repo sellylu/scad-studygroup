@@ -39,7 +39,7 @@
 						<li role="presentation" class="active"><a href="#" onclick="showNews('{{group_page_data.group_id}}')">News</a></li>
 						<li role="presentation"><a href="#" onclick="showSchedule('{{group_page_data.group_id}}')">Schedule</a></li>
 						<li role="presentation"><a href="#" onclick="showMaterials('{{group_page_data.group_id}}')">Materials</a></li>
-						<li role="presentation"><a href="#" onclick="showThoughts()">Thoughts</a></li>
+						<li role="presentation"><a href="#" onclick="showThoughts('{{ group_page_data.group_id }}')">Thoughts</a></li>
 						<li role="presentation"><a href="#" onclick="Group_Member_inf('{{ group_page_data.group_id }}');">Members</a></li>
 					</ul>
 
@@ -86,7 +86,7 @@
 			            <p align="center">Create at {{group_page_data.created_time}}</p>
 			            <p align="center">Finish at {{group_page_data.finished_time}}</p>
 			            <p align="center">Members: {{group_page_data.member_num}}</p>
-			            {% if group_page_data.private == 0 %}
+			            {% if group_page_data.private %}
 					        <p align="center">Public group</p>
 				        {% else %}
 					        <p align="center">Private group</p>

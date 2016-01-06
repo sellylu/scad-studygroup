@@ -314,18 +314,43 @@ function add_materials(group_id) {
 }
 
 // Thought Tab
-function showThoughts() {
+function showThoughts(group_id) {
 	$('#myContent').empty();
+
+	var str = '/get_group_thoughts/' + group_id;
+
+	$.get(str, function(data){
+		data = data.split(";");
+		var news = '';
+		for(var i = 0; i < data.length-1; i++) {
+			var tmp = data[i].split(',');
+		    thought_date = tmp[0];
+		    thought_content = tmp[1];
+		    news += '<tr><td>' + thought_date + '</td><td>' + thought_content + '</td></tr>';
+		}
+
+		$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>CONTENT</td></tr></thead><tbody>' + news + '</tbody></table>');
+		console.log(data);
+	});
+
+
 	var textarea = $('<textarea/>', {id: 'editor'});
 	var div= $('<div/>', {id: 'test'});
 	$('#myContent').append(textarea);
 	$('#myContent').append(div);
-	$('#myContent').append("<button onclick='show()'>Sub</button>");
+	$('#myContent').append("<button onclick='show(" + group_id + ")'>Sub</button>");
 	$('#editor').jqte();
 }
 
-function show() {
-	$('#test').html($('#editor').val());
+function show(group_id) {
+	content = $('#editor').val();
+
+
+	url = '/post_group_thoughts/' + group_id +'/';
+	$.post( url, {content: content})
+	.then(function () {
+		  window.location = '/group/'+group_id;
+		  });
 }
 
 // Member Tab
