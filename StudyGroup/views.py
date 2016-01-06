@@ -15,7 +15,7 @@ def index(request):
 		if 'group_name' in request.POST:
 			creator = request.POST['creator_id']
 			cursor = connection.cursor()
-			selectsql = "SELECT * FROM scad_user WHERE user_id = '%s'" %(creator)
+			selectsql = "SELECT * FROM user WHERE user_id = '%s'" %(creator)
 			cursor.execute(selectsql)
 			user_data = cursor.fetchone()
 			
@@ -65,7 +65,7 @@ def index(request):
 			name = request.POST['user_name']
 			pic = request.POST['user_pic']
 			cursor = connection.cursor()
-			selectsql = "SELECT * FROM scad_user WHERE user_id = '%s';" %(id)
+			selectsql = "SELECT * FROM user WHERE user_id = '%s';" %(id)
 			cursor.execute(selectsql)
 			user_data = cursor.fetchall()
 			cursor2 = connection.cursor()
@@ -120,7 +120,7 @@ def group(request,group_id):
 					'private':group_data[9],
 					'creator': group_data[10]
 			}
-			return render(request,'group.html',{'group_page_data':group})
+			return render(request, 'group_page.html', {'group_page_data':group})
 		else:    # no this group
 			raise PermissionDenied
 
@@ -135,7 +135,7 @@ def group(request,group_id):
 			cursor.execute(getgroupnosql)
 			group_no = cursor.fetchone()[0]
 			
-			getjoin_group = "SELECT join_group FROM scad_user WHERE user_id = '%s'" % (join_id)
+			getjoin_group = "SELECT join_group FROM user WHERE user_id = '%s'" % (join_id)
 			cursor.execute(getjoin_group)
 			join_g = cursor.fetchone()[0]
 			
@@ -148,7 +148,7 @@ def group(request,group_id):
 			cursor.execute(getgroup_member)
 			g_member = cursor.fetchone()[0]
 			
-			getuserno = "SELECT no FROM scad_user WHERE user_id = '%s'" % (join_id)
+			getuserno = "SELECT no FROM user WHERE user_id = '%s'" % (join_id)
 			cursor.execute(getuserno)
 			user_no = cursor.fetchone()[0]
 			
@@ -165,12 +165,12 @@ def group(request,group_id):
 def user(request,user_id):
 	
 	cursor = connection.cursor()
-	selectsql = "SELECT join_group FROM scad_user WHERE user_id = '%s'" %(user_id)
+	selectsql = "SELECT join_group FROM user WHERE user_id = '%s'" %(user_id)
 	cursor.execute(selectsql)
 	user_group = cursor.fetchone()[0][:-1]
 	
 	if user_group == '':
-		return render(request,'user.html')
+		return render(request, 'user_page.html')
 	else:
 		getgroupinfosql = "SELECT group_id,group_name,intro,created_time,finished_time FROM study_group WHERE no in ("+user_group+")";
 		cursor.execute(getgroupinfosql)
@@ -186,7 +186,7 @@ def user(request,user_id):
 					'finished_time':x[4],
 			}
 			data_list.append(group)
-		return render(request,'user.html',{'user_page_data':data_list})
+		return render(request, 'user_page.html', {'user_page_data':data_list})
 
 
 def group_member_inf(request,group_id):
@@ -199,7 +199,7 @@ def group_member_inf(request,group_id):
 	group_member_data = data.split(',')
 	user_inf = ''
 	for member in group_member_data:
-		getuserinfsql = "SELECT name,email,pic FROM scad_user WHERE no = '%d'" %(int(member))
+		getuserinfsql = "SELECT name,email,pic FROM user WHERE no = '%d'" %(int(member))
 		cursor.execute(getuserinfsql)
 		tmp = cursor.fetchone()
 		user_inf = user_inf + tmp[0] + ',' + tmp[1] + ',' + tmp[2] + ';'
@@ -209,7 +209,7 @@ def group_member_inf(request,group_id):
 def userno(request,user_id):
 	
 	cursor = connection.cursor()
-	getuserno = "SELECT no FROM scad_user WHERE user_id ='%s'" % (user_id);
+	getuserno = "SELECT no FROM user WHERE user_id ='%s'" % (user_id);
 	cursor.execute(getuserno)
 	data = cursor.fetchone()[0]
 	return HttpResponse(data)
