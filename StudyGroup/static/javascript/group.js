@@ -24,6 +24,37 @@ function logout() {
 	window.location = '/';
 }
 
+function send_mail_submit(group_id) {
+	check_title = $('#title').val();
+	check_content = $('#content').val();
+
+	nosubmit = 0;
+	if(check_content =='') {
+		$('#contentdiv').attr('class','form-group has-error');
+		nosubmit =1;
+	} else {
+		$('#contentdiv').attr('class','form-group');
+	}
+	if(check_title=='') {
+		$('#titlediv').attr('class','form-group has-error');
+		nosubmit =1;
+	} else {
+		$('#titlediv').attr('class','form-group');
+	}
+	if(nosubmit==1)return false;
+
+	creator_id = Cookies.get('user_id');
+	title = document.getElementById("title").value;
+	content = document.getElementById("content").value;
+
+	str = '/send_mail/' + group_id + '/';
+	$.post( str, { title : title,  content : content, creator_id: creator_id})
+		.then(function () {
+			window.location = '/group/'+group_id;
+		});
+}
+
+// Progress
 function showprogress(created_time,finish_time){
 	
 	var ct = new Date(created_time);
@@ -228,6 +259,60 @@ function showSchedule(group_id) {
 	
 }
 
+// Material Tab
+function showMaterials(group_id) {
+	$('#myContent').empty();
+
+	$('#myContent').append('<button type="button" class="btn btn-primary" id="add_materials_button" data-toggle="modal" data-target="#add_materials_Modal">Add Materials</button>');
+	var str = '/get_group_materials/' + group_id;
+
+	$.get(str, function(data){
+		var tmp = data.split(";");
+		var materials = '';
+		for(var i = 0; i < tmp.length-1; i++) {
+			tmp2 = tmp[i].split(',');
+			materials_date = tmp2[0];
+			materials_title = tmp2[1];
+			materials_content = tmp2[2];
+			materials += '<tr onclick="displayContent(' + i + ')"><td>' + materials_date + '</td><td>' + materials_title + '</td></tr>' + '<tr class="news_content" id=' + i + '><td colspan="2">' + materials_content + '</td></tr>';
+		}
+
+		$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>CONTENT</td></tr></thead><tbody>' + materials + '</tbody></table>');
+		console.log(data);
+	});
+}
+
+function add_materials(group_id) {
+	check_materials_title = $('#materials_title').val();
+	check_materials_content = $('#materials_content').val();
+
+	nosubmit = 0;
+
+	if(check_materials_content =='') {
+		$('#contentdiv').attr('class','form-group has-error');
+		nosubmit =1;
+	} else {
+		$('#contentdiv').attr('class','form-group');
+	}
+	if(check_materials_title=='') {
+		$('#namediv').attr('class','form-group has-error');
+		nosubmit =1;
+	} else {
+		$('#namediv').attr('class','form-group');
+	}
+	if(nosubmit==1)return false;
+
+	//creator_id = Cookies.get('user_id');
+	title = document.getElementById("materials_title").value;
+	content = document.getElementById("materials_content").value;
+
+	url = '/post_group_materials/' + group_id +'/';
+	$.post( url, {title : title, content: content})
+		.then(function () {
+			window.location = '/group/'+group_id;
+	});
+}
+
 // Thought Tab
 function showThoughts() {
 	$('#myContent').empty();
@@ -248,14 +333,17 @@ function Group_Member_inf(id){
 	$('#myContent').empty();
 	var str = '/group/' + id + '/member_inf';
 	$.get(str, function(data){
-		  var tmp = data.split(",");
-		  var member = '';
-		  for(var i = 0; i < tmp.length; i+=2) {
-		  member += '<tr><td>' + tmp[i] + '</td><td>' + tmp[i+1] + '</td></tr>';
-		  }
-		  $('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>NAME</td><td>EMAIL</td></tr></thead><tbody>' + member + '</tbody></table>');
-		  console.log(data);
-		  });
+		console.log(data);
+		var tmp = data.split(";");
+		var member = '';
+		for(var i = 0; i < tmp.length-1; i++) {
+			tmp2 = tmp[i].split(',');
+			img = '<img src="' + tmp2[2] + '"/>';
+			member += '<tr><td>' + tmp2[0] + '</td><td>' + tmp2[1] + '</td><td>' + img + '</td></tr>';
+		}
+		$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>NAME</td><td>EMAIL</td><td>PHOTO</td></tr></thead><tbody>' + member + '</tbody></table>');
+		console.log(data);
+	});
 }
 
 function joinGroup(group_id) {

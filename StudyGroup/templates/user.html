@@ -20,7 +20,7 @@
 
         <script type="text/javascript">
             $(document).ready(function() {
-              showGroup();
+              //showGroup();
             });
             function creategroup_submit() {
 	            check_group_name = $('#group_name').val();
@@ -61,14 +61,14 @@
 	            date = Date.now();
 	            group_id = creator_id + date;
 	            member_limit = parseInt(document.getElementsByName("member_limit")[0].value);
-	            $.post( "/index/", { group_id : group_id, group_name : group_name,  member_limit :member_limit,intro:intro,private:private,creator_id:creator_id ,finished_time:finished_time})
+	            $.post( "/", { group_id : group_id, group_name : group_name,  member_limit :member_limit,intro:intro,private:private,creator_id:creator_id ,finished_time:finished_time})
 			            .then(function () {
 				            window.location = '/group/'+group_id;
 			            });
             }
             function logout() {
 	            Cookies.remove('user_id');
-	            window.location = '/index/';
+	            window.location = '/';
             }
             function showGroup() {
                 $('#myContent').empty();
@@ -94,6 +94,11 @@
                     {% endfor %}
 	                $('#myContent').append('<div class="list-group">' + groups + '</div>');
                 {% endif %}
+            }
+
+            function showMission() {
+	            $('#myContent').empty();
+
             }
 
             function showAchievement() {
@@ -129,16 +134,26 @@
 
                 $('#myContent').append(div);
             }
+            function showMailbox() {
+	            $('#myContent').empty();
 
-        function showMission() {
-	        $('#myContent').empty();
-			// TODO:
-        }
+	            user_id = Cookies.get('user_id');
+	            str = '/get_mail/' + user_id + '/';
 
-        function showMailbox() {
-	        $('#myContent').empty();
-	        // TODO:
-        }
+				$.get(str, function(data){
+					var tmp = data.split(";");
+					var news = '';
+					for(var i = 0; i < tmp.length-1; i++) {
+						tmp2 = tmp[i].split(',');
+						mail_title = tmp2[0];
+						mail_content = tmp2[1];
+						mail_created_time = tmp2[2];
+						news += '<tr onclick="displayContent(' + i + ')"><td>' + mail_created_time + '</td><td>' + mail_title + '</td></tr>' + '<tr class="news_content" id=' + i + '><td colspan="2">' + mail_content + '</td></tr>';
+					}
+					$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>CONTENT</td></tr></thead><tbody>' + news + '</tbody></table>');
+					console.log(data);
+				});
+            }
 
         </script>
     </head>
@@ -148,7 +163,7 @@
         <nav class="navbar navbar-inverse navbar-fixed-top" id="NavBar">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <a href="/index/" class="navbar-brand" style="color: #ddd; border: #000 1px;"><b>Study Group</b></a>
+                    <a href="/" class="navbar-brand" style="color: #ddd; border: #000 1px;"><b>Study Group</b></a>
                 </div>
 				<div class="collapse navbar-collapse">
 

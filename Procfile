@@ -1,1 +1,1 @@
-web: gunicorn scad_back.wsgi --log-file -
+web: gunicorn scad.wsgi --log-file -
