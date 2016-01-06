@@ -7,6 +7,7 @@ import time
 import datetime
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
+import random
 
 @csrf_exempt
 def index(request):
@@ -367,6 +368,39 @@ def get_mail(request,user_id):
 
 		data = data + tmp2_data
 	return HttpResponse(data)
+
+
+def get_mission(request,user_id):
+
+	get_user_group_sql = "SELECT join_group FROM user WHERE user_id = '%s' " % (user_id)
+	cursor = connection.cursor()
+	cursor.execute(get_user_group_sql)
+	tmp_g = cursor.fetchone()[0][:-1]
+	tmp_g = tmp_g.split(',')
+	if len(tmp_g) > 0:
+		ranint = random.randint(1,100)
+		ranint = ranint % len(tmp_g)
+
+		select_group_no = int(tmp_g[ranint])
+		print(select_group_no)
+		get_group_member_sql = "SELECT group_name,group_member FROM study_group WHERE no = '%d'" %(select_group_no)
+		cursor.execute(get_group_member_sql)
+		get_data = cursor.fetchone()
+		group_name = get_data[0]
+		group_member = get_data[1][:-1]
+		group_member = group_member.split(',')
+
+		data = ''+group_name+'!'
+		for member in group_member:
+			get_user_name_pic_sql = "SELECT name,pic FROM user WHERE no ='%d'" %(int(member))
+			cursor.execute(get_user_name_pic_sql)
+			tmp_data = cursor.fetchone()
+			data = data + tmp_data[0] + ',' + tmp_data[1] + ';'
+		print(data)
+		return HttpResponse(data)
+	else:
+		return HttpResponse("fwe")
+
 
 def strcheck(string):
 
