@@ -63,7 +63,7 @@ function logout(){
 
 function saveUserInfo() {
 
-	FB.api('/me',{"fields": "name, email, picture"}, function(response) {
+	FB.api('/me',{"fields": "name, email, picture","type":"large"}, function(response) {
 		   if(response && !response.error) {
 
                $.post("/",{

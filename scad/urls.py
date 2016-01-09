@@ -21,6 +21,8 @@ from StudyGroup.views import get_group_thoughts
 from StudyGroup.views import post_group_thoughts
 from StudyGroup.views import post_group_thought_reply
 from StudyGroup.views import post_file
+from StudyGroup.views import post_mission
+from StudyGroup.views import check_Name
 
 urlpatterns = [
 	url(r'^admin/', include(admin.site.urls)),
@@ -44,6 +46,8 @@ urlpatterns = [
 	url(r'^post_group_thoughts/(?P<group_id>[0-9]+)/$', post_group_thoughts),
 	url(r'^post_group_thought_reply/(?P<group_id>[0-9]+)/$', post_group_thought_reply),
 	url(r'^post_file/(?P<group_id>[0-9]+)/$', post_file),
+	url(r'^post_mission/$',post_mission),
+	url(r'^check_Name/(?P<mission_no>[0-9]+)/$',check_Name),
 ]
  
 urlpatterns += staticfiles_urlpatterns()

@@ -16,14 +16,14 @@ def index(request):
 		if 'group_name' in request.POST:
 			creator = request.POST['creator_id']
 			cursor = connection.cursor()
-			selectsql = "SELECT * FROM scad_user WHERE user_id = '%s'" %(creator)
+			selectsql = "SELECT * FROM user WHERE user_id = '%s'" %(creator)
 			cursor.execute(selectsql)
 			user_data = cursor.fetchone()
 			
 			if(len(user_data)) > 0:
 				user_no = user_data[0]
 				str_user_no = str(user_no)+','
-				user_join_group = user_data[5]
+				user_join_group = user_data[4]
 				
 				group_name = request.POST['group_name']
 				group_name = strcheck(group_name)
@@ -50,7 +50,7 @@ def index(request):
 				user_join_group = user_join_group + str(group_created_no[0]) + ','
 				
 				# insert the group no to the user
-				update_creator_join_group_sql = "UPDATE scad_user SET created_achieve='1',join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+				update_creator_join_group_sql = "UPDATE user SET created_achieve=1,join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 				cursor.execute(update_creator_join_group_sql)
 				return HttpResponseRedirect('/group/{}'.format(group_id))
 
@@ -66,15 +66,15 @@ def index(request):
 			name = request.POST['user_name']
 			pic = request.POST['user_pic']
 			cursor = connection.cursor()
-			selectsql = "SELECT * FROM scad_user WHERE user_id = '%s';" %(id)
+			selectsql = "SELECT * FROM user WHERE user_id = '%s';" %(id)
 			cursor.execute(selectsql)
 			user_data = cursor.fetchall()
 			cursor2 = connection.cursor()
 			if len(user_data) == 0:
-				insertsql = "INSERT INTO scad_user(name,user_id,email,login_cnt,pic) VALUES ('%s','%s','%s',1,'%s')" %(name,id,email,pic)
+				insertsql = "INSERT INTO user(name,user_id,email,login_cnt,pic) VALUES ('%s','%s','%s',1,'%s')" %(name,id,email,pic)
 				cursor2.execute(insertsql)
 			else:
-				updatesql = "UPDATE scad_user SET login_cnt = login_cnt + 1 WHERE user_id = '%s'" % (id)
+				updatesql = "UPDATE user SET login_cnt = login_cnt + 1 WHERE user_id = '%s'" % (id)
 				cursor2.execute(updatesql)
 			return HttpResponseRedirect("/")
 	
@@ -136,20 +136,20 @@ def group(request,group_id):
 			cursor.execute(getgroupnosql)
 			group_no = cursor.fetchone()[0]
 			
-			getjoin_group = "SELECT join_group FROM scad_user WHERE user_id = '%s'" % (join_id)
+			getjoin_group = "SELECT join_group FROM user WHERE user_id = '%s'" % (join_id)
 			cursor.execute(getjoin_group)
 			join_g = cursor.fetchone()[0]
 			
 			joined_data = join_g + str(group_no) +','
 			
-			updatejoingroupsql = "UPDATE scad_user SET join_group = '%s' WHERE user_id ='%s'" % (joined_data,join_id)
+			updatejoingroupsql = "UPDATE user SET join_group = '%s' WHERE user_id ='%s'" % (joined_data,join_id)
 			cursor.execute(updatejoingroupsql)
 			
 			getgroup_member = "SELECT group_member FROM study_group WHERE group_id = '%s'" % (group_id)
 			cursor.execute(getgroup_member)
 			g_member = cursor.fetchone()[0]
 			
-			getuserno = "SELECT no FROM scad_user WHERE user_id = '%s'" % (join_id)
+			getuserno = "SELECT no FROM user WHERE user_id = '%s'" % (join_id)
 			cursor.execute(getuserno)
 			user_no = cursor.fetchone()[0]
 			
@@ -166,14 +166,14 @@ def group(request,group_id):
 def user(request,user_id):
 	
 	cursor = connection.cursor()
-	selectsql = "SELECT join_group FROM scad_user WHERE user_id = '%s'" %(user_id)
+	selectsql = "SELECT join_group FROM user WHERE user_id = '%s'" %(user_id)
 	cursor.execute(selectsql)
 	user_group = cursor.fetchone()[0][:-1]
 	
 	if user_group == '':
 		return render(request, 'user_page.html')
 	else:
-		getgroupinfosql = "SELECT group_id,group_name,intro,created_time,finished_time FROM study_group WHERE no in (" + user_group + ")"
+		getgroupinfosql = "SELECT group_id,group_name,intro,created_time,finished_time FROM study_group WHERE no in ("+user_group+")";
 		cursor.execute(getgroupinfosql)
 		group_data = cursor.fetchall()
 
@@ -200,7 +200,7 @@ def group_member_inf(request,group_id):
 	group_member_data = data.split(',')
 	user_inf = ''
 	for member in group_member_data:
-		getuserinfsql = "SELECT name,email,pic FROM scad_user WHERE no = '%d'" %(int(member))
+		getuserinfsql = "SELECT name,email,pic FROM user WHERE no = '%d'" %(int(member))
 		cursor.execute(getuserinfsql)
 		tmp = cursor.fetchone()
 		user_inf = user_inf + tmp[0] + ',' + tmp[1] + ',' + tmp[2] + ';'
@@ -210,7 +210,7 @@ def group_member_inf(request,group_id):
 def userno(request,user_id):
 	
 	cursor = connection.cursor()
-	getuserno = "SELECT no FROM scad_user WHERE user_id ='%s'" % (user_id);
+	getuserno = "SELECT no FROM user WHERE user_id ='%s'" % (user_id);
 	cursor.execute(getuserno)
 	data = cursor.fetchone()[0]
 	return HttpResponse(data)
@@ -345,7 +345,7 @@ def send_mail(request,group_id):
 		group_member = tmp_member.split(',')
 
 		for member in group_member:
-			update_mail_sql = "UPDATE scad_user SET mail = '%s' WHERE no = '%d' " %(no_str,int(member))
+			update_mail_sql = "UPDATE user SET mail = '%s' WHERE no = '%d' " %(no_str,int(member))
 			cursor.execute(update_mail_sql)
 		return HttpResponseRedirect('/group/{}'.format(group_id))
 
@@ -353,7 +353,7 @@ def send_mail(request,group_id):
 def get_mail(request,user_id):
 
 	cursor = connection.cursor()
-	get_all_mail_no_sql = "SELECT mail FROM scad_user WHERE user_id = '%s'" %(user_id)
+	get_all_mail_no_sql = "SELECT mail FROM user WHERE user_id = '%s'" %(user_id)
 
 	cursor.execute(get_all_mail_no_sql)
 	all_mail_no = cursor.fetchone()[0][:-1]
@@ -370,37 +370,104 @@ def get_mail(request,user_id):
 	return HttpResponse(data)
 
 
+@csrf_exempt
+def post_mission(request):
+	get_group_no_mem = "SELECT no,group_member FROM study_group"
+	cursor = connection.cursor()
+	cursor.execute(get_group_no_mem)
+
+	group_no_mem = cursor.fetchall()
+	group_no_mem_len = len(group_no_mem)
+
+	if group_no_mem_len > 0:
+		ranint = random.randint(1,100)
+		ranint = ranint % group_no_mem_len
+
+		member_list_str = group_no_mem[ranint][1][:-1]
+
+
+
+		member_list = member_list_str.split(',')
+
+
+		name_list = []
+		# name_list is question
+		for member in member_list:
+
+			get_member_name = "SELECT name,mission FROM user WHERE no = '%d'" % int(member)
+			cursor.execute(get_member_name)
+			tmp = cursor.fetchone()[0]
+			name_list.append(tmp)
+
+
+
+
+
+
+		ranint = random.randint(1,100)
+
+		choose_person = ranint % len(name_list)
+		get_choosed_member_user_id = "SELECT user_id FROM user WHERE name = '%s'" % name_list[choose_person]
+		cursor.execute(get_choosed_member_user_id)
+
+		#question_url is the question
+		#ans_name is the ans
+		question_user_id = cursor.fetchone()[0]
+		ans_name = name_list[choose_person]
+		name_list_string = ''
+		for a in name_list:
+			name_list_string = name_list_string + a +','
+
+
+		#get time
+		t = time.time()
+		created_time = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d-%h%m%s')
+
+		insert_mission_sql = "INSERT INTO mission(question_user_id,question_name,ans,time) VALUES ('%s','%s','%s','%s')" % (question_user_id,name_list_string,ans_name,t)
+		cursor.execute(insert_mission_sql)
+
+		#get mission no
+		get_mission = "SELECT no FROM mission WHERE time ='%s'" % t
+		cursor.execute(get_mission)
+		mission_no = cursor.fetchone()[0]
+
+		#insert mission to user
+
+		for m in member_list:
+			#get_user_origin mission first
+			get_user_mission = "SELECT mission FROM user WHERE no ='%d'" % int(m)
+			cursor.execute(get_user_mission)
+			tmp = cursor.fetchone()[0]
+
+			tmp = tmp + str(mission_no)+ ','
+			#update user mission
+
+			update_user_mission = "UPDATE user SET mission = '%s' WHERE no ='%d'" % (tmp,int(m))
+			cursor.execute(update_user_mission)
+
+
+
+		return HttpResponse("hello")
 def get_mission(request,user_id):
 
-	get_user_group_sql = "SELECT join_group FROM scad_user WHERE user_id = '%s' " % (user_id)
+
+	get_user_mission = "SELECT mission FROM user WHERE user_id='%s'" % user_id
 	cursor = connection.cursor()
-	cursor.execute(get_user_group_sql)
-	tmp_g = cursor.fetchone()[0][:-1]
-	tmp_g = tmp_g.split(',')
-	if len(tmp_g) > 0:
-		ranint = random.randint(1,100)
-		ranint = ranint % len(tmp_g)
+	cursor.execute(get_user_mission)
+	mission_str = cursor.fetchone()[0][:-1]
+	print(mission_str)
+	return HttpResponse(mission_str)
 
-		select_group_no = int(tmp_g[ranint])
-		print(select_group_no)
-		get_group_member_sql = "SELECT group_name,group_member FROM study_group WHERE no = '%d'" %(select_group_no)
-		cursor.execute(get_group_member_sql)
-		get_data = cursor.fetchone()
-		group_name = get_data[0]
-		group_member = get_data[1][:-1]
-		group_member = group_member.split(',')
 
-		data = ''+group_name+'!'
-		for member in group_member:
-			get_user_name_pic_sql = "SELECT name,pic FROM scad_user WHERE no ='%d'" %(int(member))
-			cursor.execute(get_user_name_pic_sql)
-			tmp_data = cursor.fetchone()
-			data = data + tmp_data[0] + ',' + tmp_data[1] + ';'
-		print(data)
-		return HttpResponse(data)
-	else:
-		return HttpResponse("fwe")
+def check_Name(request,mission_no):
 
+	get_Mission = "SELECT * FROM mission WHERE no = '%d' " % int(mission_no)
+	cursor = connection.cursor()
+	cursor.execute(get_Mission)
+	data = cursor.fetchone()
+	data_str = data[2] +';'+data[3]+';'+data[4]
+
+	return HttpResponse(data_str)
 
 def get_group_thoughts(request, group_id):
 

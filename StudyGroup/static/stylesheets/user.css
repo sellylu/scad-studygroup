@@ -23,6 +23,9 @@
 .modal-footer {
   word-wrap: break-word;
 }
+form {
+  text-align:center;
+}
 
 /* line 50, ../sass/styles.scss */
 .thumbnail {

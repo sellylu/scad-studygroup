@@ -66,7 +66,7 @@ function showprogress(created_time,finish_time){
 	
 	// limit has pass
 	if(alltime ==0 ){
-		
+	
 		$('progress-bar').attr('style','width:100%');
 	}else{
 		
