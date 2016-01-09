@@ -140,23 +140,26 @@
 				$.get(str, function(data){
 
 					tmp = data.split(';');
-					
-					user_pic = tmp[0];
-					
-					name_list = tmp[1].split(',');
-					ans = tmp[2];
-					alert(name_list);
-		            div = $('<div/>', {
-		                'class': 'nameChecking'
-		            }).css({
-		            	'text-align': 'center'
-		            }).html('<p id="question">Who is this?</p><p><button type="button" onclick="checkAns(\'' + name_list[0] + '\')">' + name_list[0] + '</button><button type="button" onclick="checkAns(\'' + name_list[1] + '\')">' + name_list[1]  + '</button></p>');
+					user_id = tmp[0];
 
+					user_pic = 'http://graph.facebook.com/' + user_id + '/picture?type=large';
 		            img = $('<img/>', {
 		                'class': 'achievement',
 		                src: user_pic,
 		                width: 200
-		            }).prependTo(div);
+		            });
+					
+					name_list = tmp[1].split(',');
+					ans = tmp[2];
+
+
+		        }).then(function () {
+		            div = $('<div/>', {
+		                'class': 'nameChecking'
+		            }).css({
+		            	'text-align': 'center'
+		            }).html('<p id="question">Who is this?</p><p><button type="button" onclick="checkAns(\'' + name_list[0] + '\')">' + name_list[0] + '</button><button type="button" onclick="checkAns(\'' + name_list[1] + '\')">' + name_list[1]  + '</button></p>').prepend(img);
+
 
 		            $('#name_checking_div').append(div);
 		        });

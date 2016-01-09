@@ -407,12 +407,12 @@ def post_mission(request):
 		ranint = random.randint(1,100)
 		
 		choose_person = ranint % len(name_list)
-		get_choosed_member_pic = "SELECT pic FROM user WHERE name = '%s'" % name_list[choose_person]
-		cursor.execute(get_choosed_member_pic)
+		get_choosed_member_user_id = "SELECT user_id FROM user WHERE name = '%s'" % name_list[choose_person]
+		cursor.execute(get_choosed_member_user_id)
 		
 		#question_url is the question
 		#ans_name is the ans
-		question_url = cursor.fetchone()[0]
+		question_user_id = cursor.fetchone()[0]
 		ans_name = name_list[choose_person]
 		name_list_string = ''
 		for a in name_list:
@@ -423,25 +423,21 @@ def post_mission(request):
 		t = time.time()
 		created_time = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d-%h%m%s')
 		
-		insert_mission_sql = "INSERT INTO mission(question_url,question_name,ans,time) VALUES ('%s','%s','%s','%s')" % (question_url,name_list_string,ans_name,t)
+		insert_mission_sql = "INSERT INTO mission(question_user_id,question_name,ans,time) VALUES ('%s','%s','%s','%s')" % (question_user_id,name_list_string,ans_name,t)
 		cursor.execute(insert_mission_sql)
 
 		#get mission no
 		get_mission = "SELECT no FROM mission WHERE time ='%s'" % t
 		cursor.execute(get_mission)
 		mission_no = cursor.fetchone()[0]
-		print(str(mission_no) + 'ffeef')
-		print(mission_no)
-
+	
 		#insert mission to user
 
 		for m in member_list:
-			print(str(m) + 'www')
 			#get_user_origin mission first
 			get_user_mission = "SELECT mission FROM user WHERE no ='%d'" % int(m)
 			cursor.execute(get_user_mission)
 			tmp = cursor.fetchone()[0]
-			print(tmp)
 
 			tmp = tmp + str(mission_no)+ ','
 			#update user mission
@@ -464,8 +460,7 @@ def get_mission(request,user_id):
 	
 
 def check_Name(request,mission_no):
-	print('fff')
-	print(mission_no)
+
 	get_Mission = "SELECT * FROM mission WHERE no = '%d' " % int(mission_no)
 	cursor = connection.cursor()
 	cursor.execute(get_Mission)
