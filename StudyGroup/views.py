@@ -111,10 +111,10 @@ def group(request,group_id):
 		if group_data:
 			group = {
 				'group_id': group_data[1],
-					'group_name':group_data[2],
-					'created_time':group_data[3],
-					'finished_time':group_data[4],
-					'member_num':group_data[5],
+				'group_name':group_data[2],
+				'created_time':group_data[3],
+				'finished_time':group_data[4],
+				'member_num':group_data[5],
 					'member_limit':group_data[6],
 					'group_member':group_data[7],
 					'intro': group_data[8],

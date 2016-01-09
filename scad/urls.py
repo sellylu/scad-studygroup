@@ -20,6 +20,7 @@ from StudyGroup.views import get_mission
 
 urlpatterns = [
 	url(r'^admin/', include(admin.site.urls)),
+	url(r'^index',index),
 	url(r'^$', index),
 	url(r'^group/(?P<group_id>[0-9]+)/$',group),
 	url(r'^user/(?P<user_id>[0-9]+)/$',user),
