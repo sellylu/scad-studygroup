@@ -112,7 +112,7 @@ function creategroup_submit() {
 		private = 1;
 	}
 	date = Date.now();
-	group_id = creator_id + date;
+	var group_id = creator_id + date;
 	member_limit = parseInt(document.getElementsByName("member_limit")[0].value);
 	
 	$.post( "/", { group_id : group_id, group_name : group_name,  member_limit :member_limit,intro:intro,private:private,creator_id:creator_id ,finished_time:finished_time})
@@ -239,7 +239,7 @@ function showSchedule(group_id) {
 								
 								dayClick: function(date, allDay, jsEvent, view) {
 								var title = prompt('Add new event');
-								if(title!=null){
+								if(title){
 								var d = new Date(date);
 								var year = d.getFullYear();
 								var month = (d.getMonth()+1);
@@ -317,40 +317,97 @@ function add_materials(group_id) {
 function showThoughts(group_id) {
 	$('#myContent').empty();
 
-	var str = '/get_group_thoughts/' + group_id;
+	var newThought_str = '<div class="btn btn-success" data-toggle="modal" data-target="#new_thoughts_Modal"><i class="glyphicon glyphicon-plus"></i>New Thought</div><br class="space">';
 
-	$.get(str, function(data){
+	var output = newThought_str + '<div class="panel-group">';
+
+	$.get('/get_group_thoughts/' + group_id + '/', function(data) {
 		data = data.split(";");
-		var news = '';
-		for(var i = 0; i < data.length-1; i++) {
-			var tmp = data[i].split(',');
-		    thought_date = tmp[0];
-		    thought_content = tmp[1];
-		    news += '<tr><td>' + thought_date + '</td><td>' + thought_content + '</td></tr>';
+		var tmp_str = '<ul class="list-group">';
+		for (var i = 0; i < data.length - 1; i++) {
+			tmp = data[i].split(',');
+			var thought = {
+				'no': tmp[0],
+				'date': tmp[1],
+				'title': tmp[2],
+				'content': tmp[3],
+				'creator_id': tmp[4]
+			};
+			reply_num = (tmp.length - 5)/4;
+			output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + thought.no + '" data-toggle="collapse">'
+				+ thought.title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + thought.date + '</div><div class="col-md-4" align="right">Replied by ' + reply_num + ' people.</div></div></div>'
+				+ '<div class="panel-collapse collapse" id="t' + thought.no + '">';
+			for (var j = 5; j < tmp.length; j += 4) {
+				var obj = {
+					'date': tmp[j],
+					'content': tmp[j + 1],
+					'creator': tmp[j + 2],
+					'creator_pic': tmp[j + 3]
+				};
+				tmp_str += '<li class="list-group-item"><div class="row"><div class="col-md-1"><img src="' + obj.creator_pic + '" class="img-thumbnail"></div>'
+					+ '<div class="col-md-11"><div class="reply-info">' + obj.creator + ' / ' + obj.date + '</div>'
+					+ '<div class="reply-content">' + obj.content + '</div></div></div></li>';
+			}
+			output += tmp_str + '</ul><div class="panel-footer"><button class="btn btn-default" id="b' + thought.no + '" onclick="showEditor(' + thought.no + ');">Reply</button><div id="e' + thought.no + '" style="display: none;"><textarea id="ta' + thought.no + '" style="width: 800px; height: 100px;"></textarea><br><button class="btn btn-success" onclick="postReply(\'' + group_id + '\', ' + thought.no + ');">Submit</button></div></div></div></div></div>';
 		}
-
-		$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>CONTENT</td></tr></thead><tbody>' + news + '</tbody></table>');
-		console.log(data);
+		$('#myContent').append(output);
 	});
-
-
-	var textarea = $('<textarea/>', {id: 'editor'});
-	var div= $('<div/>', {id: 'test'});
-	$('#myContent').append(textarea);
-	$('#myContent').append(div);
-	$('#myContent').append("<button onclick='show(" + group_id + ")'>Sub</button>");
-	$('#editor').jqte();
 }
 
-function show(group_id) {
-	content = $('#editor').val();
+function showEditor(thought_id){
+	tID = 'ta' + thought_id;
+	new nicEditor({fullPanel : true}).panelInstance(tID);
+	$('#e'+thought_id).show();
+	$('#b'+thought_id).hide();
+}
 
+function postReply(group_id, thought_id) {
+	tID = 'ta' + thought_id;
+	content = new nicEditors.findEditor(tID).getContent();
+	creator_id = Cookies.get('user_id');
+	$('#e'+thought_id).hide();
+	$('#b'+thought_id).show();
+
+	url = '/post_group_thought_reply/' + group_id +'/';
+
+	$.post(url, {content: content, thought_id: thought_id, creator_id: creator_id})
+		.then(function () {
+			window.location = '/group/' + group_id;
+		});
+}
+
+function postThought(group_id) {
+
+
+	check_thought_title = $('#thought_title').val();
+	check_thought_content = $('#thought_content').val();
+
+	nosubmit = 0;
+
+	if(check_thought_content =='') {
+		$('#contentdiv').attr('class','form-group has-error');
+		nosubmit =1;
+	} else {
+		$('#contentdiv').attr('class','form-group');
+	}
+	if(check_thought_title=='') {
+		$('#namediv').attr('class','form-group has-error');
+		nosubmit =1;
+	} else {
+		$('#namediv').attr('class','form-group');
+	}
+	if(nosubmit==1)return false;
+
+	creator_id = Cookies.get('user_id');
+	title = document.getElementById("thought_title").value;
+	content = document.getElementById("thought_content").value;
 
 	url = '/post_group_thoughts/' + group_id +'/';
-	$.post( url, {content: content})
-	.then(function () {
-		  window.location = '/group/'+group_id;
-		  });
+
+	$.post(url, {title: title, content: content, creator_id: creator_id})
+		.then(function () {
+			window.location = '/group/' + group_id;
+		});
 }
 
 // Member Tab

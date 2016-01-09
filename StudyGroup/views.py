@@ -23,7 +23,7 @@ def index(request):
 			if(len(user_data)) > 0:
 				user_no = user_data[0]
 				str_user_no = str(user_no)+','
-				user_join_group = user_data[4]
+				user_join_group = user_data[5]
 				
 				group_name = request.POST['group_name']
 				group_name = strcheck(group_name)
@@ -50,7 +50,7 @@ def index(request):
 				user_join_group = user_join_group + str(group_created_no[0]) + ','
 				
 				# insert the group no to the user
-				update_creator_join_group_sql = "UPDATE scad_user SET created_achieve=1,join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+				update_creator_join_group_sql = "UPDATE scad_user SET created_achieve='1',join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 				cursor.execute(update_creator_join_group_sql)
 				return HttpResponseRedirect('/group/{}'.format(group_id))
 
@@ -71,7 +71,7 @@ def index(request):
 			user_data = cursor.fetchall()
 			cursor2 = connection.cursor()
 			if len(user_data) == 0:
-				insertsql = "INSERT INTO user(name,user_id,email,login_cnt,pic) VALUES ('%s','%s','%s',1,'%s')" %(name,id,email,pic)
+				insertsql = "INSERT INTO scad_user(name,user_id,email,login_cnt,pic) VALUES ('%s','%s','%s',1,'%s')" %(name,id,email,pic)
 				cursor2.execute(insertsql)
 			else:
 				updatesql = "UPDATE scad_user SET login_cnt = login_cnt + 1 WHERE user_id = '%s'" % (id)
@@ -173,7 +173,7 @@ def user(request,user_id):
 	if user_group == '':
 		return render(request, 'user_page.html')
 	else:
-		getgroupinfosql = "SELECT group_id,group_name,intro,created_time,finished_time FROM study_group WHERE no in ("+user_group+")";
+		getgroupinfosql = "SELECT group_id,group_name,intro,created_time,finished_time FROM study_group WHERE no in (" + user_group + ")"
 		cursor.execute(getgroupinfosql)
 		group_data = cursor.fetchall()
 
@@ -401,28 +401,71 @@ def get_mission(request,user_id):
 	else:
 		return HttpResponse("fwe")
 
-def get_group_thoughts(request,group_id):
+
+def get_group_thoughts(request, group_id):
 
 	cursor = connection.cursor()
-	get_group_newssql = "SELECT * FROM thought WHERE group_id ='%s' ORDER BY no DESC" % (group_id);
-	cursor.execute(get_group_newssql)
+	get_thoughts_sql = "SELECT * FROM thought WHERE group_id ='%s' ORDER BY no DESC" % (group_id)
+	cursor.execute(get_thoughts_sql)
 	data = cursor.fetchall()
-	news_str = ''
-	for news in data:
-		news_str = news_str + news[2]+',' +news[3] + ';'
-	return HttpResponse(news_str)
+	thought_str = ''
+	if data:
+		for thought in data:
+			get_reply_sql = "SELECT * FROM thought_reply WHERE thought_id ='%s' ORDER BY no DESC" % (thought[0])
+			cursor.execute(get_reply_sql)
+			data2 = cursor.fetchall()
+			thought_str += str(thought[0]) + ',' + thought[2] + ',' + thought[3] + ',' + thought[4] + ',' + thought[5] + ','
+
+			if data2:
+				for i, reply in enumerate(data2):
+					get_user_sql = "SELECT name,pic FROM scad_user WHERE user_id = '%s'" % reply[4]
+					cursor.execute(get_user_sql)
+					data3 = cursor.fetchone()
+					if data3 and len(data2)-1 is not i:
+						thought_str += reply[2] + ',' + reply[3] + ',' + data3[0] + ',' + data3[1] + ','
+					elif data3:
+						thought_str += reply[2] + ',' + reply[3] + ',' + data3[0] + ',' + data3[1]
+					elif not data3 and len(data2)-1 is not i:
+						thought_str += reply[2] + ',' + reply[3] + ',nobody,unavailable,'
+					else:
+						thought_str += reply[2] + ',' + reply[3] + ',nobody,unavailable'
+				thought_str += ';'
+		print(thought_str)
+		return HttpResponse(thought_str)
+	else:
+		return HttpResponse("")
 
 
 @csrf_exempt
-def post_group_thoughts(request,group_id):
+def post_group_thoughts(request, group_id):
 
-	content = request.POST['content']
+	title = strcheck(request.POST['title'])
+	content = strcheck(request.POST['content'])
+	creator_id = request.POST['creator_id']
 	t = time.time()
 	date = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d')
 	cursor = connection.cursor()
-	content = strcheck(content)
-	post_group_newssql = "INSERT INTO thought(group_id,content,created_time) VALUES('%s','%s','%s')" % (group_id,content,date);
-	cursor.execute(post_group_newssql)
+	post_thoughts_sql = "INSERT INTO thought(group_id, title, content, created_time, creator_id) VALUES('%s','%s','%s','%s','%s')" % (group_id, title, content, date, creator_id)
+	cursor.execute(post_thoughts_sql)
+	return HttpResponseRedirect('/group/{}'.format(group_id))
+
+
+@csrf_exempt
+def post_group_thought_reply(request, group_id):
+
+	content = strcheck(request.POST['content'])
+	thought_id = request.POST['thought_id']
+	creator_id = request.POST['creator_id']
+	t = time.time()
+	date = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d')
+	cursor = connection.cursor()
+	post_reply_sql = "INSERT INTO thought_reply(thought_id,content,created_time, creator_id) VALUES('%s','%s','%s','%s')" % (thought_id, content, date, creator_id);
+	cursor.execute(post_reply_sql)
+	return HttpResponseRedirect('/group/{}'.format(group_id))
+
+
+@csrf_exempt
+def post_file(requext, group_id):
 	return HttpResponseRedirect('/group/{}'.format(group_id))
 
 

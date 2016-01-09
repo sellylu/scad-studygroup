@@ -19,14 +19,18 @@
         <script src="{% static 'javascript/moment.min.js' %}"></script>
         <script src="{% static 'javascript/fullcalendar.js' %}"></script>
         <script src="{% static 'javascript/group.js' %}"></script>
+	    <script src="{% static 'javascript/nicEdit.js' %}"></script>
 		<link href="{% static 'stylesheets/jquery-te-1.4.0.css' %}" rel="stylesheet" type="text/css"/>
 		<link href="{% static 'stylesheets/group.css' %}" rel="stylesheet" type="text/css"/>
 		<link href="{% static 'stylesheets/fullcalendar.css' %}" rel="stylesheet" type="text/css"/>
-	    <link href="{% static 'stylesheets/simple-sidebar.css' %}" rel="stylesheet"/>
+	    <link href="{% static 'stylesheets/simple-sidebar.css' %}" rel="stylesheet" type="text/css"/>
 
+	    <script type="text/javascript">
+		    bkLib.onDomLoaded(function() { nicEditors.allTextAreas() });
+	    </script>
 
     </head>
-    <body onload="checkShowLoginDiv();setuser_no();checkShowAddButton('{{group_page_data.group_member}}');showprogress('{{group_page_data.created_time}}','{{ group_page_data.finished_time}}');showNews('{{group_page_data.group_id}}')">
+    <body onload="checkShowLoginDiv();setuser_no();checkShowAddButton('{{group_page_data.group_member}}');showprogress('{{group_page_data.created_time}}','{{ group_page_data.finished_time}}');showThoughts('{{group_page_data.group_id}}')">
 
         <!-- Navigation Bar -->
         <nav class="navbar navbar-inverse navbar-fixed-top" id="NavBar">
@@ -104,12 +108,8 @@
 	            <div id="page-content-wrapper">
 		            <!-- Container -->
                     <div class="container-fluid" id="myContent">
-                    </div>
 
-		            <div class="shine">Shine...</div>
-
-<script>
-
+ <!--script>
 $(function(){
 	var i = 14;
     setInterval(flicker,1500);//迴圈閃爍，間隔1秒
@@ -119,7 +119,7 @@ function flicker(){//閃爍函數
 	$('.shine').css('font-size', $('.shine').css('font-size')+1);
 }
 
-</script>
+</script-->
 	            </div>
 	        </div>
         {% endif %}
@@ -139,7 +139,7 @@ function flicker(){//閃爍函數
 					<div class="modal-body">
 						<div id="contentdiv">
 							<label>Content</label>
-							<textarea class="form-control" name="content" id="content" rows="3"></textarea>
+							<textarea class="form-control editor" name="content" id="content" rows="3"></textarea>
 							<hr>
 						</div>
 					</div>
@@ -165,7 +165,7 @@ function flicker(){//閃爍函數
 					<div class="modal-body">
 						<div id="contentdiv">
 							<label>Content</label>
-							<textarea class="form-control" name="news_content" id="news_content" rows="3"></textarea>
+							<textarea class="form-control editor" name="news_content" id="news_content" rows="3"></textarea>
 							<hr>
 						</div>
 					</div>
@@ -192,13 +192,40 @@ function flicker(){//閃爍函數
 					<div class="modal-body">
 						<div id="contentdiv">
 							<label>Content</label>
-							<textarea class="form-control" name="materials_content" id="materials_content" rows="3"></textarea>
+							<textarea class="form-control editor" name="materials_content" id="materials_content" rows="3"></textarea>
 							<hr>
 						</div>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 						<button type="button" class="btn btn-primary" onclick="add_materials('{{group_page_data.group_id}}')">Post</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <!-- New Thought Modal -->
+		<div id="new_thoughts_Modal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<div id="namediv">
+							<h4 class="modal-title">Title</h4>
+							<input type="text" class="form-control" name="thought_title" id="thought_title" placeholder="Title">
+						</div>
+					</div>
+					<div class="modal-body">
+						<div id="contentdiv">
+							<label>Content</label>
+							<textarea class="form-control editor" name="thought_content" id="thought_content" rows="3"></textarea>
+							<hr>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="postThought('{{group_page_data.group_id}}')">Post</button>
 					</div>
 				</div>
 			</div>

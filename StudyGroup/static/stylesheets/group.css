@@ -24,24 +24,21 @@
   word-wrap: break-word;
 }
 
-/* line 50, ../sass/styles.scss */
-.thumbnail {
+.img-thumbnail {
   overflow: hidden;
   padding: 0px;
   border: 0px solid #fff;
   background-color: transparent;
+	max-width: inherit;
 }
 
-/* line 57, ../sass/styles.scss */
-.image-container {
-  background-color: #011C28;
-  overflow: auto;
+a {
+	color: #555;
+	text-decoration: none;
 }
-
-/* line 62, ../sass/styles.scss */
-.thumbnail > img, .thumbnail a > img {
-  max-width: none;
-  max-height: 200px;
+a:hover {
+	color: #F75E7A;
+	text-decoration: none;
 }
 
 body {
@@ -89,21 +86,32 @@ header {
   margin: auto;
 }
 
-#editor {
-	display:block;
-	margin:0 0 10px;
-	padding:6px;
-	width:95%;
-	background:#FFF;
-	border:#AAA 1px solid;
-	font-size:13px;
-}
-textarea#editor, div#editor, span#editor{
-	min-height:100px;
-}
-
 .news_content {
   text-align: center;
   display: none;
+}
 
+.panel-group {
+	padding-top: 20px;
+}
+
+.panel.thought {
+	margin: 0;
+}
+
+.thought-info {
+	font-size: 14px;
+}
+
+.reply-info {
+	font-size: 12px;
+	color: grey;
+}
+
+.editor {
+	width: 550px;
+	height: 300px;
+}
+.nicEdit-main {
+	height: 100px;
 }

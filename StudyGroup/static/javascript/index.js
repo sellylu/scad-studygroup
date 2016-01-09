@@ -44,6 +44,8 @@ function creategroup_submit() {
     }
     date = Date.now();
     group_id = creator_id + date;
+	member_limit = parseInt(document.getElementsByName("member_limit")[0].value);
+
     $.post( "/", { group_id : group_id, group_name : group_name,  member_limit :member_limit,intro:intro,private:private,creator_id:creator_id ,finished_time:finished_time})
         .then(function () {
             window.location = '/group/'+group_id;
