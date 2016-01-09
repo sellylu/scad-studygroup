@@ -12,16 +12,32 @@
 		<link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons"/>
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"/>
+		{% load static %}
+
 		
-        {% load static %}
+		
         <link href="{% static 'stylesheets/user.css' %}" rel="stylesheet" type="text/css">
         <link href="{% static 'stylesheets/simple-sidebar.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'stylesheets/jquery.fancybox.css' %}" rel="stylesheet" type="text/css">
         <script src="{% static 'javascript/js_cookie.js'  %}"></script>
+        <script src="{% static 'javascript/jquery.fancybox.js'  %}"></script>
 
         <script type="text/javascript">
+        	var ans;
             $(document).ready(function() {
               showGroup();
-            });
+            
+				$(".missionBox").fancybox({
+					'scrolling'		: 'no',
+					'titleShow'		: false,
+					'onClosed'		: function() {
+					
+						$("#name_checking_div").empty();
+					}
+				});	
+			
+
+			});
             function creategroup_submit() {
 	            check_group_name = $('#group_name').val();
 	            check_group_intro = $('#intro').val();
@@ -102,21 +118,58 @@
 	            user_id = Cookies.get('user_id');
 	            str = '/get_mission/' + user_id + '/';
 				$.get(str, function(data){
-					var tmp = data.split("!");
-					var group_name = tmp[0];
-					var user_list = tmp[1].split(';');
 
+					mission_list = data.split(',');
 					var mission ='';
-					for(var i = 0; i < user_list.length-1; i++) {
-						user = user_list[i].split(',');
-						user_name = user[0];
-						user_pic = user[1];
-						mission += '<tr onclick="displayContent(' + i + ')"><td>' + group_name + '</td><td>' + user_name + '</td><td>' + '<img src="' +user_pic +'"/> </td></tr>';
+					for(var i = 0; i < mission_list.length; i++) {
+						mission_no = mission_list[i];
+						mission = '<a class="missionBox" href="#name_checking_div" onclick="renderMission(' + mission_no + ')"><div class="list-group-item row"><h4 align="center">Mission from System</h4></div></a>';
+						
 					}
-					$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>Group</td><td>Name</td><td>Pic</td></tr></thead><tbody>' + mission + '</tbody></table>');
+
+					$('#myContent').append(mission);
 					console.log(data);
 				});
             }
+
+			function renderMission(mission_no) {
+				$("#name_checking_div").empty();
+					
+				str = '/check_Name/' + mission_no.toString()+ '/';
+				
+				$.get(str, function(data){
+
+					tmp = data.split(';');
+					
+					user_pic = tmp[0];
+					
+					name_list = tmp[1].split(',');
+					ans = tmp[2];
+					alert(name_list);
+		            div = $('<div/>', {
+		                'class': 'nameChecking'
+		            }).css({
+		            	'text-align': 'center'
+		            }).html('<p id="question">Who is this?</p><p><button type="button" onclick="checkAns(\'' + name_list[0] + '\')">' + name_list[0] + '</button><button type="button" onclick="checkAns(\'' + name_list[1] + '\')">' + name_list[1]  + '</button></p>');
+
+		            img = $('<img/>', {
+		                'class': 'achievement',
+		                src: user_pic,
+		                width: 200
+		            }).prependTo(div);
+
+		            $('#name_checking_div').append(div);
+		        });
+			}
+
+			function checkAns (input) {
+				if(input == ans) {
+					alert('you got it right');	
+				}
+				else {
+					alert('wrong answerQQ')
+				}
+			}
 
             function showAchievement() {
                 $('#myContent').empty();
@@ -225,6 +278,14 @@
 		        </div>
 	        </div>
         </div>
+
+
+
+
+        <div style="display:none" id="name_checking_div">
+
+		</div>
+
 
         <!-- Modal -->
 		<div id="create_group_Modal" class="modal fade" role="dialog">

@@ -370,37 +370,109 @@ def get_mail(request,user_id):
 	return HttpResponse(data)
 
 
+@csrf_exempt
+def post_mission(request):
+	get_group_no_mem = "SELECT no,group_member FROM study_group"
+	cursor = connection.cursor()
+	cursor.execute(get_group_no_mem)
+
+	group_no_mem = cursor.fetchall()
+	group_no_mem_len = len(group_no_mem)
+
+	if group_no_mem_len > 0:
+		ranint = random.randint(1,100)
+		ranint = ranint % group_no_mem_len
+		
+		member_list_str = group_no_mem[ranint][1][:-1]
+		
+
+		
+		member_list = member_list_str.split(',')
+		
+
+		name_list = []
+		# name_list is question
+		for member in member_list:
+			
+			get_member_name = "SELECT name,mission FROM user WHERE no = '%d'" % int(member)
+			cursor.execute(get_member_name)
+			tmp = cursor.fetchone()[0]
+			name_list.append(tmp)
+			
+			
+
+
+		
+
+		ranint = random.randint(1,100)
+		
+		choose_person = ranint % len(name_list)
+		get_choosed_member_pic = "SELECT pic FROM user WHERE name = '%s'" % name_list[choose_person]
+		cursor.execute(get_choosed_member_pic)
+		
+		#question_url is the question
+		#ans_name is the ans
+		question_url = cursor.fetchone()[0]
+		ans_name = name_list[choose_person]
+		name_list_string = ''
+		for a in name_list:
+			name_list_string = name_list_string + a +','
+
+
+		#get time
+		t = time.time()
+		created_time = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d-%h%m%s')
+		
+		insert_mission_sql = "INSERT INTO mission(question_url,question_name,ans,time) VALUES ('%s','%s','%s','%s')" % (question_url,name_list_string,ans_name,t)
+		cursor.execute(insert_mission_sql)
+
+		#get mission no
+		get_mission = "SELECT no FROM mission WHERE time ='%s'" % t
+		cursor.execute(get_mission)
+		mission_no = cursor.fetchone()[0]
+		print(str(mission_no) + 'ffeef')
+		print(mission_no)
+
+		#insert mission to user
+
+		for m in member_list:
+			print(str(m) + 'www')
+			#get_user_origin mission first
+			get_user_mission = "SELECT mission FROM user WHERE no ='%d'" % int(m)
+			cursor.execute(get_user_mission)
+			tmp = cursor.fetchone()[0]
+			print(tmp)
+
+			tmp = tmp + str(mission_no)+ ','
+			#update user mission
+
+			update_user_mission = "UPDATE user SET mission = '%s' WHERE no ='%d'" % (tmp,int(m))
+			cursor.execute(update_user_mission)
+
+
+
+		return HttpResponse("hello")
 def get_mission(request,user_id):
 
-	get_user_group_sql = "SELECT join_group FROM user WHERE user_id = '%s' " % (user_id)
+	
+	get_user_mission = "SELECT mission FROM user WHERE user_id='%s'" % user_id
 	cursor = connection.cursor()
-	cursor.execute(get_user_group_sql)
-	tmp_g = cursor.fetchone()[0][:-1]
-	tmp_g = tmp_g.split(',')
-	if len(tmp_g) > 0:
-		ranint = random.randint(1,100)
-		ranint = ranint % len(tmp_g)
+	cursor.execute(get_user_mission)
+	mission_str = cursor.fetchone()[0][:-1]
+	print(mission_str)
+	return HttpResponse(mission_str)
+	
 
-		select_group_no = int(tmp_g[ranint])
-		print(select_group_no)
-		get_group_member_sql = "SELECT group_name,group_member FROM study_group WHERE no = '%d'" %(select_group_no)
-		cursor.execute(get_group_member_sql)
-		get_data = cursor.fetchone()
-		group_name = get_data[0]
-		group_member = get_data[1][:-1]
-		group_member = group_member.split(',')
+def check_Name(request,mission_no):
+	print('fff')
+	print(mission_no)
+	get_Mission = "SELECT * FROM mission WHERE no = '%d' " % int(mission_no)
+	cursor = connection.cursor()
+	cursor.execute(get_Mission)
+	data = cursor.fetchone()
+	data_str = data[2] +';'+data[3]+';'+data[4]
 
-		data = ''+group_name+'!'
-		for member in group_member:
-			get_user_name_pic_sql = "SELECT name,pic FROM user WHERE no ='%d'" %(int(member))
-			cursor.execute(get_user_name_pic_sql)
-			tmp_data = cursor.fetchone()
-			data = data + tmp_data[0] + ',' + tmp_data[1] + ';'
-		print(data)
-		return HttpResponse(data)
-	else:
-		return HttpResponse("fwe")
-
+	return HttpResponse(data_str)
 
 def strcheck(string):
 
