@@ -68,7 +68,7 @@ WSGI_APPLICATION = 'scad.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-'''
+
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.mysql',
@@ -90,7 +90,7 @@ DATABASES = {
 		'PORT': '5432',
 	}
 }
-'''
+
 import dj_database_url
 
 DATABASES = {

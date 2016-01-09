@@ -231,6 +231,12 @@
 					console.log(data);
 				});
             }
+	        function displayContent(id) {
+		        if(document.getElementById(id).style.display == "none")
+			        $('#'+id).show();
+		        else
+			        document.getElementById(id).style.display = "none";
+	        }
 
         </script>
     </head>

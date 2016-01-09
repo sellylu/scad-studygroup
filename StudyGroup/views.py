@@ -203,6 +203,7 @@ def group_member_inf(request,group_id):
 		getuserinfsql = "SELECT name,email,pic FROM user WHERE no = '%d'" %(int(member))
 		cursor.execute(getuserinfsql)
 		tmp = cursor.fetchone()
+		print(tmp)
 		user_inf = user_inf + tmp[0] + ',' + tmp[1] + ',' + tmp[2] + ';'
 	return HttpResponse(user_inf)
 
@@ -401,9 +402,6 @@ def post_mission(request):
 
 
 
-
-
-
 		ranint = random.randint(1,100)
 
 		choose_person = ranint % len(name_list)
@@ -445,11 +443,10 @@ def post_mission(request):
 			update_user_mission = "UPDATE user SET mission = '%s' WHERE no ='%d'" % (tmp,int(m))
 			cursor.execute(update_user_mission)
 
-
-
 		return HttpResponse("hello")
-def get_mission(request,user_id):
 
+
+def get_mission(request,user_id):
 
 	get_user_mission = "SELECT mission FROM user WHERE user_id='%s'" % user_id
 	cursor = connection.cursor()
@@ -478,24 +475,25 @@ def get_group_thoughts(request, group_id):
 	thought_str = ''
 	if data:
 		for thought in data:
-			get_reply_sql = "SELECT * FROM thought_reply WHERE thought_id ='%s' ORDER BY no DESC" % (thought[0])
+			get_user_sql = "SELECT name FROM user WHERE user_id = '%s'" % thought[5]
+			cursor.execute(get_user_sql)
+			data4 = cursor.fetchone()
+			thought_str += str(thought[0]) + ',' + thought[2] + ',' + thought[3] + ',' + thought[4] + ',' + data4[0]
+			get_reply_sql = "SELECT * FROM thought_reply WHERE thought_id ='%d' ORDER BY no DESC" % (int(thought[0]))
 			cursor.execute(get_reply_sql)
 			data2 = cursor.fetchall()
-			thought_str += str(thought[0]) + ',' + thought[2] + ',' + thought[3] + ',' + thought[4] + ',' + thought[5] + ','
 
 			if data2:
 				for i, reply in enumerate(data2):
-					get_user_sql = "SELECT name,pic FROM scad_user WHERE user_id = '%s'" % reply[4]
+					get_user_sql = "SELECT name,pic FROM user WHERE user_id = '%s'" % reply[4]
 					cursor.execute(get_user_sql)
 					data3 = cursor.fetchone()
-					if data3 and len(data2)-1 is not i:
-						thought_str += reply[2] + ',' + reply[3] + ',' + data3[0] + ',' + data3[1] + ','
-					elif data3:
-						thought_str += reply[2] + ',' + reply[3] + ',' + data3[0] + ',' + data3[1]
-					elif not data3 and len(data2)-1 is not i:
-						thought_str += reply[2] + ',' + reply[3] + ',nobody,unavailable,'
+					if data3:
+						thought_str += ',' + reply[2] + ',' + reply[3] + ',' + data3[0] + ',' + data3[1]
 					else:
-						thought_str += reply[2] + ',' + reply[3] + ',nobody,unavailable'
+						thought_str += ',' + reply[2] + ',' + reply[3] + ',0,0'
+				thought_str += ';'
+			else:
 				thought_str += ';'
 		print(thought_str)
 		return HttpResponse(thought_str)

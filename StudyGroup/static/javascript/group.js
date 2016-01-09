@@ -26,7 +26,7 @@ function logout() {
 
 function send_mail_submit(group_id) {
 	check_title = $('#title').val();
-	check_content = $('#content').val();
+	check_content = new nicEditors.findEditor("content").getContent();;
 
 	nosubmit = 0;
 	if(check_content =='') {
@@ -45,7 +45,7 @@ function send_mail_submit(group_id) {
 
 	creator_id = Cookies.get('user_id');
 	title = document.getElementById("title").value;
-	content = document.getElementById("content").value;
+	content = new nicEditors.findEditor("content").getContent();
 
 	str = '/send_mail/' + group_id + '/';
 	$.post( str, { title : title,  content : content, creator_id: creator_id})
@@ -79,7 +79,7 @@ function showprogress(created_time,finish_time){
 // Create Group
 function creategroup_submit() {
 	check_group_name = $('#group_name').val();
-	check_group_intro = $('#intro').val();
+	check_group_intro =  new nicEditors.findEditor("intro").getContent();
 	check_time = $('#finished_time_date').val();
 	nosubmit = 0;
 	if(check_time == '') {
@@ -104,7 +104,7 @@ function creategroup_submit() {
 	
 	creator_id = Cookies.get('user_id');
 	group_name = document.getElementById("group_name").value;
-	intro = document.getElementById("intro").value;
+	content = new nicEditors.findEditor("intro").getContent();
 	finished_time = document.getElementById("finished_time_date").value;
 	if(document.getElementById("private_op1").checked) {
 		private = 0;
@@ -284,7 +284,7 @@ function showMaterials(group_id) {
 
 function add_materials(group_id) {
 	check_materials_title = $('#materials_title').val();
-	check_materials_content = $('#materials_content').val();
+	check_materials_content = new nicEditors.findEditor("materials_content").getContent();;
 
 	nosubmit = 0;
 
@@ -304,7 +304,7 @@ function add_materials(group_id) {
 
 	//creator_id = Cookies.get('user_id');
 	title = document.getElementById("materials_title").value;
-	content = document.getElementById("materials_content").value;
+	content = new nicEditors.findEditor("materials_content").getContent();
 
 	url = '/post_group_materials/' + group_id +'/';
 	$.post( url, {title : title, content: content})
@@ -331,12 +331,13 @@ function showThoughts(group_id) {
 				'date': tmp[1],
 				'title': tmp[2],
 				'content': tmp[3],
-				'creator_id': tmp[4]
+				'creator': tmp[4]
 			};
 			reply_num = (tmp.length - 5)/4;
 			output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + thought.no + '" data-toggle="collapse">'
-				+ thought.title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + thought.date + '</div><div class="col-md-4" align="right">Replied by ' + reply_num + ' people.</div></div></div>'
+				+ thought.title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + thought.date + ' by ' + thought.creator + '</div><div class="col-md-4" align="right">Replied by ' + reply_num + ' people.</div></div></div>'
 				+ '<div class="panel-collapse collapse" id="t' + thought.no + '">';
+			output += '<div class="panel-body">' + thought.content + '</div>';
 			for (var j = 5; j < tmp.length; j += 4) {
 				var obj = {
 					'date': tmp[j],
@@ -348,8 +349,9 @@ function showThoughts(group_id) {
 					+ '<div class="col-md-11"><div class="reply-info">' + obj.creator + ' / ' + obj.date + '</div>'
 					+ '<div class="reply-content">' + obj.content + '</div></div></div></li>';
 			}
-			output += tmp_str + '</ul><div class="panel-footer"><button class="btn btn-default" id="b' + thought.no + '" onclick="showEditor(' + thought.no + ');">Reply</button><div id="e' + thought.no + '" style="display: none;"><textarea id="ta' + thought.no + '" style="width: 800px; height: 100px;"></textarea><br><button class="btn btn-success" onclick="postReply(\'' + group_id + '\', ' + thought.no + ');">Submit</button></div></div></div></div></div>';
+			output += tmp_str + '</ul><div class="panel-footer"><button class="btn btn-default" id="b' + thought.no + '" onclick="showEditor(' + thought.no + ');">Reply</button><div id="e' + thought.no + '" style="display: none;"><textarea id="ta' + thought.no + '" style="width: 800px; height: 100px;"></textarea><br><button class="btn btn-success" onclick="postReply(\'' + group_id + '\', ' + thought.no + ');">Submit</button></div></div></div></div>';
 		}
+		output += '</div>'
 		$('#myContent').append(output);
 	});
 }
@@ -363,6 +365,19 @@ function showEditor(thought_id){
 
 function postReply(group_id, thought_id) {
 	tID = 'ta' + thought_id;
+
+	check_thought_content = new nicEditors.findEditor(tID).getContent();;
+
+	nosubmit = 0;
+
+	if(check_thought_content =='') {
+		$('#contentdiv').attr('class','form-group has-error');
+		nosubmit =1;
+	} else {
+		$('#contentdiv').attr('class','form-group');
+	}
+	if(nosubmit==1)return false;
+
 	content = new nicEditors.findEditor(tID).getContent();
 	creator_id = Cookies.get('user_id');
 	$('#e'+thought_id).hide();
@@ -380,7 +395,7 @@ function postThought(group_id) {
 
 
 	check_thought_title = $('#thought_title').val();
-	check_thought_content = $('#thought_content').val();
+	check_thought_content = new nicEditors.findEditor("thought_content").getContent();;
 
 	nosubmit = 0;
 
@@ -400,7 +415,8 @@ function postThought(group_id) {
 
 	creator_id = Cookies.get('user_id');
 	title = document.getElementById("thought_title").value;
-	content = document.getElementById("thought_content").value;
+	content = new nicEditors.findEditor("thought_content").getContent();
+
 
 	url = '/post_group_thoughts/' + group_id +'/';
 

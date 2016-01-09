@@ -95,9 +95,11 @@ header {
 	padding-top: 20px;
 }
 
-.panel.thought {
-	margin: 0;
+.thought {
+	margin: 0px;
+	margin-top: 0px;
 }
+
 
 .thought-info {
 	font-size: 14px;
