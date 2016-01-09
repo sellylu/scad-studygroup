@@ -150,6 +150,11 @@
 		            });
 					
 					name_list = tmp[1].split(',');
+					name = '';
+		            for(i = 0; i < name_list.length-1; i++) {
+		            	name += '<button type="button" onclick="checkAns(\'' + name_list[i] + '\')">' + name_list[i] + '</button>';
+		            }
+		            
 					ans = tmp[2];
 
 
@@ -158,8 +163,7 @@
 		                'class': 'nameChecking'
 		            }).css({
 		            	'text-align': 'center'
-		            }).html('<p id="question">Who is this?</p><p><button type="button" onclick="checkAns(\'' + name_list[0] + '\')">' + name_list[0] + '</button><button type="button" onclick="checkAns(\'' + name_list[1] + '\')">' + name_list[1]  + '</button></p>').prepend(img);
-
+		            }).html('<p id="question">Who is this?</p><p>' + name +'</p>').prepend(img);
 
 		            $('#name_checking_div').append(div);
 		        });
