@@ -68,13 +68,13 @@
 
 		<!-- Container -->
         <div class="container">
-            <div class="row">
+            <!-- Joined Group -->
+            <div class="row" id="joined-group">
                 <div class="col-md-12">
-                    <h2>Recommended Groups</h2>
+                    <h2>My Groups</h2>
                     <br class="space">
                 </div>
 				
-				<!-- TODO: creator name + member number-->
 				{% if group_data %}
 					{% for group in group_data %}
 						{% if group.private == 0 %}
@@ -103,12 +103,48 @@
 						{% endif %}
 					{% endfor %}
 				{% endif %}
-					
-					
+            </div>
+            <hr style="height:2px; background-color:#d4d4d4;">
+
+            <!-- Recommemded Groups -->
+	        <div class="row" id="recom-group">
+                <div class="col-md-12">
+                    <h2>Recommended Groups</h2>
+                    <br class="space">
                 </div>
-                <!--div class="col-md-12" align="center">
-                    <button class="btn btn-success" id="more">Show More</button>
-                </div-->
+
+				{% if group_data %}
+					{% for group in group_data %}
+						{% if group.private == 0 %}
+						<div class="col-md-4">
+							<div class="panel panel-warning">
+								<div class="panel-heading">
+									<a href="/group/{{ group.group_id }}/">
+										<div><h4 align="center">{{ group.group_name }}</h4></div>
+									</a>
+								</div>
+								<div class="panel-body">
+									<p align="center">{{ group.intro }}</p>
+									<hr>
+									<p>
+									<b>Period:</b> {{ group.created_time }} ~ {{ group.finished_time }}<br>
+										{% if group.member_limit == 0 %}
+											<b>Number of Members and Limitation:</b> {{ group.member_num }} / ∞<br>
+										{% else %}
+											<b>Number of Members and Limitation:</b> {{ group.member_num }} / {{ group.member_limit }}<br>
+										{% endif %}
+									<b>Creator:</b> {{ group.creator }}
+									</p>
+								</div>
+							</div>
+						</div>
+						{% endif %}
+					{% endfor %}
+				{% endif %}
+
+
+                </div>
+
             </div>
         </div>
 		
