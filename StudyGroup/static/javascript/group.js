@@ -63,7 +63,9 @@ function send_mail_submit(group_id) {
 	str = '/send_mail/' + group_id + '/';
 	$.post( str, { title : title,  content : content, creator_id: user_id})
 		.then(function () {
-			window.location = '/group/'+group_id;
+			setTimeout(function() {
+				window.location = '/group/'+group_id;
+			}, 3000);
 		});
 }
 
@@ -137,7 +139,7 @@ function creategroup_submit() {
 // News Tab
 function showNews(group_id) {
 	$('#myContent').empty();
-	
+	$('#news_content').val('');
 	$('#myContent').append('<button type="button" class="btn btn-primary admin-btn" id="add_news_button" data-toggle="modal" data-target="#add_news_Modal">Add News</button>');
 	var str = '/get_group_news/' + group_id;
 	

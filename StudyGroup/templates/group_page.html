@@ -158,6 +158,8 @@ function flicker(){//閃爍函數
 }
 
 </script-->
+
+
 	            </div>
 	        </div>
         {% endif %}
@@ -205,6 +207,12 @@ function flicker(){//閃爍函數
 							<label>Content</label>
 							<textarea class="form-control editor" name="news_content" id="news_content" rows="3"></textarea>
 							<hr>
+							<script>
+								$('#add_news_Modal').on('click', function() {
+									nic.findEditor("news_content").remove();
+								});
+
+							</script>
 						</div>
 					</div>
 					<div class="modal-footer">
