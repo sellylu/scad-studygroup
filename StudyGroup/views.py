@@ -740,6 +740,21 @@ def mission_complete(request,user_id):
 	cursor.execute(update_user_mission_sql)
 	
 	return HttpResponse("hello")
+
+
+def get_user_experience(request,user_id):
+	
+	cursor = connection.cursor()
+	selectsql = "SELECT exp, level FROM  user WHERE user_id = '%s'" %(user_id)
+	cursor.execute(selectsql)	
+	data = cursor.fetchone()
+	exp = data[0]
+	level = data[1]
+	print('ff')
+	data_list = str(level) + ',' + str(exp)
+	print(data_list)
+	return HttpResponse(data_list)
+
 def strcheck(string):
 
 	if '"' in string:

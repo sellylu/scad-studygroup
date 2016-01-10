@@ -188,6 +188,38 @@ var ans;
  			    }
 	        }
 
+	        function show_user_experience() {
+        user_id = Cookies.get('user_id');
+        if(user_id != undefined) {
+            $('.exp').empty();
+            user_id = Cookies.get('user_id');
+            str = '/get_user_experience/' + user_id + '/';
+
+            $.get(str, function(data){
+                var tmp = data.split(",");
+                
+                user_level = parseFloat(tmp[0]);
+                user_exp = parseFloat(tmp[1]);
+                
+                if(user_level == 0)
+                	user_exp_por = user_exp / 15 *100;
+                else if(user_level == 1)
+                	user_exp_por = (user_exp-15) / 35 *100;
+                else if(user_level == 2){
+                	
+                	user_exp_por = (user_exp-50) / 40 *100;
+                }
+                else if(user_level == 3)
+                	user_exp_por = (user_exp-90) / 50 *100;                
+                else if(user_level == 4)
+                	user_exp_por = (user_exp-140) / 60 *100;                
+                
+                $('.exp').append('<b>LV.' + user_level + '</b><div id="user_exp"><div class="progress"><div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width:' + user_exp_por + '%"></div></div></div>');
+                console.log(data);
+            });  
+        }    
+    }
+
 
 var show_mail_button_interval;
 var start = 0;
