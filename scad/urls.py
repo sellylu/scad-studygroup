@@ -25,6 +25,7 @@ from StudyGroup.views import post_mission
 from StudyGroup.views import check_Name
 from StudyGroup.views import set_mail_read
 from StudyGroup.views import get_my_group
+from StudyGroup.views import check_mail
 
 urlpatterns = [
 	url(r'^admin/', include(admin.site.urls)),
@@ -52,6 +53,7 @@ urlpatterns = [
 	url(r'^post_mission/$',post_mission),
 	url(r'^check_Name/(?P<mission_no>[0-9]+)/$',check_Name),
 	url(r'^get_my_group/(?P<user_id>[0-9]+)/$',get_my_group),
+	url(r'^check_mail/(?P<user_id>[0-9]+)/$',check_mail),
 ]
  
 urlpatterns += staticfiles_urlpatterns()

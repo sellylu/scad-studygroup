@@ -40,38 +40,39 @@
 			});
 			function showAchievement() {
                 $('#myContent').empty();
+                {% if user_achievement_data %}
+	                login_achievement_div = $('<div/>', {
+	                    'class': 'login_achievement'
+	                }).html('<h4>Login Achievement</h4>');
 
-                var div = $('<div/>', {
-                    'class': 'login_achievement'
-                }).html('<h4>Login Achievement</h4>');
-               	
-                var img = $('<img/>', {
-                    'class': 'achievement',
-                    src: '{% static "images/logo.jpg" %}',
-                    width: 150
-                }).appendTo(div);
+	                login_achieve=[];
+	                login_achieve_pic=[['badge-5_nos_black.png','badge-5_nos.png'],['badge-10_nos_black.png','badge-10_nos.png'],['badge-15_nos_black.png','badge-15_nos.png'],['badge-20_nos_black.png','badge-20_nos.png']];
 
-                var img = $('<img/>', {
-                    'class': 'achievement',
-                    src: '{% static "images/logo.jpg" %}',
-                    width: 150
-                }).appendTo(div);
-
-                var img = $('<img/>', {
-                    'class': 'achievement',
-                    src: '{% static "images/logo.jpg" %}',
-                    width: 150
-                }).appendTo(div);
-
-                var img = $('<img/>', {
-                    'class': 'achievement',
-                    src: '{% static "images/logo.jpg" %}',
-                    width: 150
-                }).appendTo(div);
-
-                $('#myContent').append(div);
+					user_login_cnt = '{{user_achievement_data.user_login_cnt}}';
+					alert(user_login_cnt);
+	               	if(user_login_cnt >=0 && user_login_cnt <= 4)
+	               		login_achieve = [0,0,0,0];
+	               	else if(user_login_cnt >=5 && user_login_cnt <= 9)
+	               		login_achieve = [1,0,0,0];
+	               	else if(user_login_cnt >=10 && user_login_cnt <= 14)
+	               		login_achieve = [1,1,0,0];
+	               	else if(user_login_cnt >=15 && user_login_cnt <= 19)
+	               		login_achieve = [1,1,1,0];	               		
+	               	else if(user_login_cnt >=20)
+	               		login_achieve = [1,1,1,1];
+	               	
+	               	for(i = 0; i < 4; i++) {
+		                $('<img/>', {
+		                    'class': 'achievement',
+		                    src: '{% static "images/' + login_achieve_pic[i][login_achieve[i]] + '" %}',
+		                    width: 150
+		                }).appendTo(login_achievement_div);
+	               	}
+	                
+	                $('#myContent').append(login_achievement_div);
+	            {% endif %}
             }
-            
+
             function showGroup() {
                 $('#myContent').empty();
                 {% if user_page_data %}

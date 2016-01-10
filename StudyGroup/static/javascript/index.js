@@ -121,6 +121,9 @@ function appendMyGroup() {
                     $('#joined-group').append(groups);
                     console.log(data);
                 });  
+
+                
+                check_mail_init(user_id);
             }           
 }
 
@@ -169,3 +172,32 @@ window.fbAsyncInit = function() {
             version    : 'v2.5'
             });
 };
+
+
+function check_mail_init(user_id){
+    
+
+    self.setInterval('check_mail(user_id)',5000); 
+  
+}
+function check_mail(user_id){
+    url = '/check_mail/' + user_id + '/'
+    $.get(url,function(data){
+    
+        if(data == 'y'){
+
+            var show_mail_button_interval = setInterval(flicker,15000);//迴圈閃爍，間隔1秒
+
+        }
+        else{
+            clearInterval(show_mail_button_interval);
+        } 
+        
+        });
+    
+}
+function flicker(){//閃爍函數
+        $('#show_mail_button').fadeOut(750).fadeIn(750);
+        $('#show_mail_button').css('font-size', $('#show_mail_button').css('font-size')+1);
+}
+    

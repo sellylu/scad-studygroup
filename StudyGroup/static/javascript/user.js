@@ -119,7 +119,7 @@ var ans;
 				}
 			}
 
-            
+
             function showMailbox() {
 	            $('#myContent').empty();
 
@@ -138,31 +138,42 @@ var ans;
 						mail_read = tmp2[4];
 
 						if(mail_read == 'y') {
-							news += '<tr class="mail_read" onclick="displayContent(' + mail_no + ')"><td>' + mail_created_time + '</td><td>' + mail_title + '</td></tr>' + '<tr class="news_content" id=' + mail_no + '><td colspan="2">' + mail_content + '</td></tr>';
-						}
-						else {
-							news += '<tr class="mail_unread" onclick="displayContent(' + mail_no + ')"><td>' + mail_created_time + '</td><td>' + mail_title + '</td></tr>' + '<tr class="news_content" id=' + mail_no + '><td colspan="2">' + mail_content + '</td></tr>';
-						}
+ 							news += '<tr class="mail_read" id="mail_' + mail_no + 'onclick="displayContent(' + mail_no + ')"><td width="10px"></td><td width="200px">' + mail_created_time + '</td><td>' + mail_title + '</td></tr>' + '<tr style="display:none;" id=' + mail_no + '><td colspan="2">' + mail_content + '</td></tr>';
+ 						}
+ 						else {
+ 							news += '<tr class="mail_unread" id="mail_' + mail_no + '" onclick="displayContent(' + mail_no + ')"><td width="10px" id="check_read_' + mail_no + '">+</td><td width="200px">' + mail_created_time + '</td><td>' + mail_title + '</td></tr>' + '<tr style="display:none;" id=' + mail_no + '><td colspan="2">' + mail_content + '</td></tr>';
+ 						}
 
 					}
-					$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>CONTENT</td></tr></thead><tbody>' + news + '</tbody></table>');
-					console.log(data);
+					$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td width="10px"></td><td width="200px">DATE</td><td>CONTENT</td></tr></thead><tbody>' + news + '</tbody></table>');
+  						
 				});
             }
 	        function displayContent(id) {
-			    if($(this).attr('className') == 'mail_unread') {
-			    	$(this).attr('className') = 'mail_read';
-	            	
-	            	user_id = Cookies.get('user_id');
-	            	str = '/set_mail/' + user_id + '/';
-		            $.post(str, { mail_no: id}).then(function () {
-					    window.location = '/get_mail/'+ user_id;
-				    });
-			    }
-
-		        if(document.getElementById(id).style.display == "none") {
-			        $('#'+id).show();
-		        }
-		        else
-			        document.getElementById(id).style.display = "none";
+			    if($('#mail_'+id).attr('class') == 'mail_unread') {
+ 			    	
+			    	if(document.getElementById(id).style.display == "none") {
+ 			    		$('#'+id).show();
+ 					}
+			        else{
+ 				        document.getElementById(id).style.display = "none";
+ 			       
+ 			   		}
+ 		        	
+ 			    	$('#mail_'+id).attr('class', 'mail_read');
+ 	            	$('#check_read_'+id).html('');
+ 
+ 	            	user_id = Cookies.get('user_id');
+ 	            	str = '/set_mail_read/' + user_id + '/';
+ 	            	$.post(str, { mail_no: id});
+ 			    }
+ 			    else {
+ 			    	if(document.getElementById(id).style.display == "none") {
+ 			    		$('#'+id).show();
+ 					}
+ 			        else{
+ 				        document.getElementById(id).style.display = "none";
+ 			       
+ 			   		}			    	
+ 			    }
 	        }

@@ -50,8 +50,28 @@ def index(request):
 				user_join_group = user_join_group + str(group_created_no[0]) + ','
 				
 				# insert the group no to the user
-				update_creator_join_group_sql = "UPDATE  user SET created_achieve=1,join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
-				cursor.execute(update_creator_join_group_sql)
+				get_user_achievement_sql = "SELECT exp FROM user WHERE no = '%d'" % (user_no)
+				cursor.execute(get_user_achievement_sql)
+				exp = cursor.fetchone()[0]
+				print('ff')
+
+				if 15<=exp+10 <= 49:
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =1,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+			
+				elif 50<=exp+10 <= 89:
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =2,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+			
+				elif 90<=exp+10 <= 139:
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =3,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+		
+				elif 140<=exp+10:
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =4,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+			
+				else:
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+		
+				cursor.execute(update_user_achievement_sql)
+				
 				return HttpResponseRedirect('/group/{}'.format(group_id))
 
 			
@@ -169,12 +189,17 @@ def group(request,group_id):
 def user(request,user_id):
 	
 	cursor = connection.cursor()
-	selectsql = "SELECT join_group FROM  user WHERE user_id = '%s'" %(user_id)
+	selectsql = "SELECT join_group, login_cnt, post_int, created_achieve FROM  user WHERE user_id = '%s'" %(user_id)
 	cursor.execute(selectsql)
-	user_group = cursor.fetchone()[0][:-1]
-	
+	data = cursor.fetchone()
+	user_group = data[0][:-1]
+	user_login_cnt = data[1]
+	user_post_int = data[2]
+	user_created_achieve = data[3]
+	user_achievement = {'user_login_cnt': user_login_cnt, 'user_post_int': user_post_int, 'user_created_achieve': user_created_achieve}
+	print(user_achievement)
 	if user_group == '':
-		return render(request, 'user_page.html')
+		return render(request, 'user_page.html', {'user_achievement_data':user_achievement})
 	else:
 		getgroupinfosql = "SELECT group_id,group_name,intro,created_time,finished_time FROM study_group WHERE no in ("+user_group+")";
 		cursor.execute(getgroupinfosql)
@@ -190,8 +215,7 @@ def user(request,user_id):
 					'finished_time':x[4],
 			}
 			data_list.append(group)
-		return render(request, 'user_page.html', {'user_page_data':data_list})
-
+		return render(request, 'user_page.html', {'user_page_data':data_list, 'user_achievement_data':user_achievement})
 
 def group_member_inf(request,group_id):
 	
@@ -206,7 +230,7 @@ def group_member_inf(request,group_id):
 		getuserinfsql = "SELECT name,email,pic FROM  user WHERE no = '%d'" %(int(member))
 		cursor.execute(getuserinfsql)
 		tmp = cursor.fetchone()
-		print(tmp)
+		
 		user_inf = user_inf + tmp[0] + ',' + tmp[1] + ',' + tmp[2] + ';'
 	return HttpResponse(user_inf)
 
@@ -279,8 +303,7 @@ def post_group_news(request,group_id):
 	cursor = connection.cursor()
 	title = strcheck(title)
 	content = strcheck(content)
-	print(title)
-	print(content)
+	
 	post_group_newssql = "INSERT INTO news(group_id,title,content,created_time) VALUES('%s','%s','%s','%s')" % (group_id,title,content,date);
 	cursor.execute(post_group_newssql)
 	return HttpResponseRedirect('/group/{}'.format(group_id))
@@ -304,7 +327,7 @@ def get_group_materials(request,group_id):
 			else:
 				post_content += str(material[0]) + ',' + material[3] + ',' + material[4] + ',' + material[5] + ',0;'
 
-	print(post_content)
+	
 	return HttpResponse(post_content)
 
 
@@ -319,6 +342,24 @@ def post_group_materials(request,group_id):
 	cursor = connection.cursor()
 	post_materials_sql = "INSERT INTO material(group_id, title, content, created_time, creator_id) VALUES('%s','%s','%s','%s','%s')" % (group_id, title, content, date, creator_id)
 	cursor.execute(post_materials_sql)
+
+	get_user_achievement_sql = "SELECT exp FROM user WHERE user_id = '%s'" % (creator_id)
+	cursor.execute(get_user_achievement_sql)
+	exp = cursor.fetchone()[0]
+	if 15<=exp+5 <= 49:
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 5,post_int = post_int +1, level = 1 WHERE user_id = '%s'" % (creator_id)
+	elif 50<=exp+5 <= 89:
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 5,post_int = post_int +1, level = 2 WHERE user_id = '%s'" % (creator_id)
+		
+	elif 90<=exp+5 <= 139:
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 5,post_int = post_int +1, level = 3 WHERE user_id = '%s'" % (creator_id)
+	elif 140<=exp+5 :
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 5,post_int = post_int +1, level = 4 WHERE user_id = '%s'" % (creator_id)
+	else:
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 5 WHERE user_id = '%s'" % (creator_id)
+				
+			
+	cursor.execute(update_user_achievement_sql)
 	return HttpResponseRedirect('/group/{}'.format(group_id))
 
 @csrf_exempt
@@ -366,7 +407,7 @@ def send_mail(request,group_id):
 		cursor.execute(get_mail_no)
 		mail_no = cursor.fetchone()[0]
 
-		print(mail_no)
+		
 
 		getgroup_member_sql = "SELECT group_member FROM study_group WHERE group_id = '%s'" % (group_id)
 		cursor.execute(getgroup_member_sql)
@@ -397,7 +438,7 @@ def get_mail(request,user_id):
 
 	cursor.execute(get_all_mail_no_sql)
 	data = cursor.fetchone()
-	print(data)
+	
 	unread = data[1][:-1].split(',')
 	all_mail_no = data[0][:-1]
 	
@@ -410,11 +451,12 @@ def get_mail(request,user_id):
 			tag = 'n'
 		else:
 			tag = 'y'
-		print(no,tag)
+		
 		tmp_data = cursor.fetchone()
 		tmp2_data = str(no) + ',' + tmp_data[3]+','+tmp_data[4]+','+tmp_data[5] + ','+ tag + ';';
 
 		data = data + tmp2_data
+	print('hhahh' + '  ' + data)
 	return HttpResponse(data)
 
 
@@ -499,7 +541,7 @@ def get_mission(request,user_id):
 	cursor = connection.cursor()
 	cursor.execute(get_user_mission)
 	mission_str = cursor.fetchone()[0][:-1]
-	print(mission_str)
+	
 	return HttpResponse(mission_str)
 
 
@@ -542,7 +584,7 @@ def get_group_thoughts(request, group_id):
 				thought_str += ';'
 			else:
 				thought_str += ';'
-		print(thought_str)
+		
 		return HttpResponse(thought_str)
 	else:
 		return HttpResponse("")
@@ -559,6 +601,24 @@ def post_group_thoughts(request, group_id):
 	cursor = connection.cursor()
 	post_thoughts_sql = "INSERT INTO thought(group_id, title, content, created_time, creator_id) VALUES('%s','%s','%s','%s','%s')" % (group_id, title, content, date, creator_id)
 	cursor.execute(post_thoughts_sql)
+
+	get_user_achievement_sql = "SELECT exp FROM user WHERE user_id = '%s'" % (creator_id)
+	cursor.execute(get_user_achievement_sql)
+	exp = cursor.fetchone()[0]
+	if 15<=exp+5 <= 49:
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 5,post_int = post_int +1, level = 1 WHERE user_id = '%s'" % (creator_id)
+	elif 50<=exp+5 <= 89:
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 5,post_int = post_int +1, level = 2 WHERE user_id = '%s'" % (creator_id)
+		
+	elif 90<=exp+5 <= 139:
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 5,post_int = post_int +1, level = 3 WHERE user_id = '%s'" % (creator_id)
+	elif 140<=exp+5 :
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 5,post_int = post_int +1, level = 4 WHERE user_id = '%s'" % (creator_id)
+	else:
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 5 WHERE user_id = '%s'" % (creator_id)
+						
+	cursor.execute(update_user_achievement_sql)
+
 	return HttpResponseRedirect('/group/{}'.format(group_id))
 
 
@@ -573,6 +633,23 @@ def post_group_thought_reply(request, group_id):
 	cursor = connection.cursor()
 	post_reply_sql = "INSERT INTO thought_reply(thought_id,content,created_time, creator_id) VALUES('%s','%s','%s','%s')" % (thought_id, content, date, creator_id);
 	cursor.execute(post_reply_sql)
+	
+	get_user_achievement_sql = "SELECT exp FROM user WHERE user_id = '%s'" % (creator_id)
+	cursor.execute(get_user_achievement_sql)
+	exp = cursor.fetchone()[0]
+	if 15<=exp+1 <= 49:
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 1, level = 1 WHERE user_id = '%s'" % (creator_id)
+	elif 50<=exp+1 <= 89:
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 1, level = 2 WHERE user_id = '%s'" % (creator_id)
+	elif 90<=exp+1 <= 139:
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 1, level = 3 WHERE user_id = '%s'" % (creator_id)
+	elif 140<=exp+1 :
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 1, level = 4 WHERE user_id = '%s'" % (creator_id)
+	else:
+		update_user_achievement_sql = "UPDATE  user SET exp = exp + 1 WHERE user_id = '%s'" % (creator_id)
+						
+	cursor.execute(update_user_achievement_sql)
+
 	return HttpResponseRedirect('/group/{}'.format(group_id))
 
 
@@ -589,7 +666,7 @@ def get_my_group(request,user_id):
 
 	
 	user_group = cursor.fetchone()[0][:-1]
-	print('here')
+	
 	if user_group == '':
 		return HttpResponse('')
 	else:
@@ -597,19 +674,30 @@ def get_my_group(request,user_id):
 		cursor.execute(getgroupinfosql)
 		
 		group_data = cursor.fetchall()
-		#print(group_data[0][0])
+		
 		data_list = ''
 		for x in group_data:
-			print(x)
+			
 			get_user_sql = "SELECT name FROM  user WHERE user_id = '%s'" % x[7]
 			cursor.execute(get_user_sql)
 			tmp = cursor.fetchone()[0]
 			data_list = data_list + str(x[0]) + ',' + str(x[1]) + ',' + str(x[2]) + ',' + str(x[3]) + ',' + str(x[4]) + ',' + str(x[5]) + ',' + str(x[6]) + ',' + tmp+ ';'
 			#data_list = data_list + group_data[x][0]
-		#print(data_list)
-		print(data_list)
+		
 		return HttpResponse(data_list)
 
+def check_mail(request,user_id):
+	get_unread = "SELECT mail_unread FROM user WHERE user_id = '%s' " % user_id
+	cursor = connection.cursor()
+	cursor.execute(get_unread)
+
+	data = cursor.fetchone()[0]
+	print(data)
+	if(len(data) > 0):
+		return HttpResponse('y')
+	
+	else:
+		return HttpResponse('n')
 def strcheck(string):
 
 	if '"' in string:

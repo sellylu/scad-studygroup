@@ -414,8 +414,8 @@ function postReply(group_id, thought_id) {
 
 	$.post(url, {content: content, thought_id: thought_id, creator_id: user_id})
 		.then(function () {
-			window.location = '/group/' + group_id;
-		});
+			showThoughts(group_id);
+	});
 }
 
 function postThought(group_id) {
@@ -451,7 +451,7 @@ function postThought(group_id) {
 			
 			$('#new_thoughts_Modal').modal('hide');
 			showThoughts(group_id);
-		});
+	});
 }
 
 // Member Tab
