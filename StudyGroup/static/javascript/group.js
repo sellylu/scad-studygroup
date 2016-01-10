@@ -2,8 +2,12 @@ $.ajaxSetup({
 			data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
 			});
 
+var user_id = Cookies.get('user_id');
+var member = 0;
+var admin = 0;
+
+
 function checkShowLoginDiv() {
-	user_id = Cookies.get('user_id');
 	if(user_id != undefined)
 		adjustCSS();
 }
@@ -14,8 +18,18 @@ function adjustCSS() {
 	$('#navbar-login').hide();
 }
 
+function checkMember() {
+	if(member)
+		$('.member-btn').show();
+	else
+		$('.member-btn').hide();
+	if(admin)
+		$('.admin-btn').show();
+	else
+		$('.admin-btn').hide();
+}
+
 function getMyInfoURL(){
-	user_id = Cookies.get('user_id');
 	window.location = '/user/'+user_id+'/';
 }
 
@@ -26,7 +40,7 @@ function logout() {
 
 function send_mail_submit(group_id) {
 	check_title = $('#title').val();
-	check_content = $('#content').val();
+	check_content = nic.findEditor("content").getContent();;
 
 	nosubmit = 0;
 	if(check_content =='') {
@@ -43,12 +57,11 @@ function send_mail_submit(group_id) {
 	}
 	if(nosubmit==1)return false;
 
-	creator_id = Cookies.get('user_id');
 	title = document.getElementById("title").value;
-	content = document.getElementById("content").value;
+	content = nic.findEditor("content").getContent();
 
 	str = '/send_mail/' + group_id + '/';
-	$.post( str, { title : title,  content : content, creator_id: creator_id})
+	$.post( str, { title : title,  content : content, creator_id: user_id})
 		.then(function () {
 			window.location = '/group/'+group_id;
 		});
@@ -78,44 +91,43 @@ function showprogress(created_time,finish_time){
 
 // Create Group
 function creategroup_submit() {
-	check_group_name = $('#group_name').val();
-	check_group_intro = $('#intro').val();
-	check_time = $('#finished_time_date').val();
-	nosubmit = 0;
+    check_group_name = $('#group_name').val();
+    check_group_intro = $('#intro').val();
+	check_time = $('#datepicker').val();
+    nosubmit = 0;
 	if(check_time == '') {
-		$('#finished_time_date').attr('style','border: 1px solid red');
+		$('#datepicker').attr('style','border: 1px solid red');
 		nosubmit =1;
 	} else {
-		$('#finished_time_date').removeAttr('style');
+		$('#datepicker').removeAttr('style');
 	}
 	if(check_group_intro =='') {
 		$('#introdiv').attr('class','form-group has-error');
 		nosubmit =1;
-	} else {
+    } else {
 		$('#introdiv').attr('class','form-group');
 	}
 	if(check_group_name=='') {
 		$('#namediv').attr('class','form-group has-error');
 		nosubmit =1;
-	} else {
+    } else {
 		$('#namediv').attr('class','form-group');
 	}
 	if(nosubmit==1)return false;
-	
-	creator_id = Cookies.get('user_id');
+
 	group_name = document.getElementById("group_name").value;
-	intro = document.getElementById("intro").value;
-	finished_time = document.getElementById("finished_time_date").value;
+	content = $('#intro').val();
+	finished_time = document.getElementById("datepicker").value;
 	if(document.getElementById("private_op1").checked) {
 		private = 0;
 	} else {
 		private = 1;
 	}
 	date = Date.now();
-	group_id = creator_id + date;
+	var group_id = user_id + date;
 	member_limit = parseInt(document.getElementsByName("member_limit")[0].value);
 	
-	$.post( "/", { group_id : group_id, group_name : group_name,  member_limit :member_limit,intro:intro,private:private,creator_id:creator_id ,finished_time:finished_time})
+	$.post( "/", { group_id : group_id, group_name : group_name,  member_limit :member_limit,intro:content,private:private,creator_id:user_id ,finished_time:finished_time})
 	.then(function () {
 		  window.location = '/group/' + group_id;
 		  });
@@ -126,23 +138,24 @@ function creategroup_submit() {
 function showNews(group_id) {
 	$('#myContent').empty();
 	
-	$('#myContent').append('<button type="button" class="btn btn-primary" id="add_news_button" data-toggle="modal" data-target="#add_news_Modal">Add News</button>');
+	$('#myContent').append('<button type="button" class="btn btn-primary admin-btn" id="add_news_button" data-toggle="modal" data-target="#add_news_Modal">Add News</button>');
 	var str = '/get_group_news/' + group_id;
 	
 	$.get(str, function(data){
-		  var tmp = data.split(";");
-		  var news = '';
-		  for(var i = 0; i < tmp.length-1; i++) {
-		  tmp2 = tmp[i].split(',');
-		  news_date = tmp2[0];
-		  news_title = tmp2[1];
-		  news_content = tmp2[2];
-		  news += '<tr onclick="displayContent(' + i + ')"><td>' + news_date + '</td><td>' + news_title + '</td></tr>' + '<tr class="news_content" id=' + i + '><td colspan="2">' + news_content + '</td></tr>';
-		  }
+		var tmp = data.split(";");
+		var news = '';
+		for(var i = 0; i < tmp.length-1; i++) {
+			tmp2 = tmp[i].split(',');
+		    news_date = tmp2[0];
+		    news_title = tmp2[1];
+		    news_content = tmp2[2];
+		    news += '<tr onclick="displayContent(' + i + ')"><td>' + news_date + '</td><td>' + news_title + '</td></tr>' + '<tr class="news_content" id=' + i + '><td colspan="2">' + news_content + '</td></tr>';
+		}
 		  
-		  $('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>CONTENT</td></tr></thead><tbody>' + news + '</tbody></table>');
-		  console.log(data);
-		  });
+		$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>CONTENT</td></tr></thead><tbody>' + news + '</tbody></table>');
+		console.log(data);
+		checkMember();
+	});
 }
 
 function add_group_news(group_id) {
@@ -165,7 +178,6 @@ function add_group_news(group_id) {
 	}
 	if(nosubmit==1)return false;
 	
-	//creator_id = Cookies.get('user_id');
 	title = document.getElementById("news_title").value;
 	content = document.getElementById("news_content").value;
 	
@@ -239,7 +251,7 @@ function showSchedule(group_id) {
 								
 								dayClick: function(date, allDay, jsEvent, view) {
 								var title = prompt('Add new event');
-								if(title!=null){
+								if(title){
 								var d = new Date(date);
 								var year = d.getFullYear();
 								var month = (d.getMonth()+1);
@@ -263,7 +275,7 @@ function showSchedule(group_id) {
 function showMaterials(group_id) {
 	$('#myContent').empty();
 
-	$('#myContent').append('<button type="button" class="btn btn-primary" id="add_materials_button" data-toggle="modal" data-target="#add_materials_Modal">Add Materials</button>');
+	$('#myContent').append('<button type="button" class="btn btn-primary member-btn" id="add_materials_button" data-toggle="modal" data-target="#add_materials_Modal">Add Materials</button>');
 	var str = '/get_group_materials/' + group_id;
 
 	$.get(str, function(data){
@@ -279,12 +291,13 @@ function showMaterials(group_id) {
 
 		$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>CONTENT</td></tr></thead><tbody>' + materials + '</tbody></table>');
 		console.log(data);
+		checkMember();
 	});
 }
 
 function add_materials(group_id) {
 	check_materials_title = $('#materials_title').val();
-	check_materials_content = $('#materials_content').val();
+	check_materials_content = nic.findEditor("materials_content").getContent();;
 
 	nosubmit = 0;
 
@@ -302,9 +315,8 @@ function add_materials(group_id) {
 	}
 	if(nosubmit==1)return false;
 
-	//creator_id = Cookies.get('user_id');
 	title = document.getElementById("materials_title").value;
-	content = document.getElementById("materials_content").value;
+	content = nic.findEditor("materials_content").getContent();
 
 	url = '/post_group_materials/' + group_id +'/';
 	$.post( url, {title : title, content: content})
@@ -314,43 +326,143 @@ function add_materials(group_id) {
 }
 
 // Thought Tab
-function showThoughts() {
+function showThoughts(group_id) {
 	$('#myContent').empty();
-	var textarea = $('<textarea/>', {id: 'editor'});
-	var div= $('<div/>', {id: 'test'});
-	$('#myContent').append(textarea);
-	$('#myContent').append(div);
-	$('#myContent').append("<button onclick='show()'>Sub</button>");
-	$('#editor').jqte();
+
+	var newThought_str = '<button class="btn btn-success member-btn" data-toggle="modal" data-target="#new_thoughts_Modal" style="width: auto"><i class="glyphicon glyphicon-plus"/>New Thought</button><br class="space">';
+
+	var output = newThought_str + '<div class="panel-group">';
+
+	$.get('/get_group_thoughts/' + group_id + '/', function(data) {
+		data = data.split(";");
+		var tmp_str = '<ul class="list-group">';
+		for (var i = 0; i < data.length - 1; i++) {
+			tmp = data[i].split(',');
+			var thought = {
+				'no': tmp[0],
+				'date': tmp[1],
+				'title': tmp[2],
+				'content': tmp[3],
+				'creator': tmp[4]
+			};
+			reply_num = (tmp.length - 5)/4;
+			output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + thought.no + '" data-toggle="collapse">'
+				+ thought.title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + thought.date + ' by ' + thought.creator + '</div><div class="col-md-4" align="right">Replied by ' + reply_num + ' people.</div></div></div>'
+				+ '<div class="panel-collapse collapse" id="t' + thought.no + '">';
+			output += '<div class="panel-body">' + thought.content + '</div>';
+			for (var j = 5; j < tmp.length; j += 4) {
+				var obj = {
+					'date': tmp[j],
+					'content': tmp[j + 1],
+					'creator': tmp[j + 2],
+					'creator_pic': tmp[j + 3]
+				};
+				tmp_str += '<li class="list-group-item"><div class="row"><div class="col-md-1"><img src="' + obj.creator_pic + '" class="img-thumbnail"></div>'
+					+ '<div class="col-md-11"><div class="reply-info">' + obj.creator + ' / ' + obj.date + '</div>'
+					+ '<div class="reply-content">' + obj.content + '</div></div></div></li>';
+			}
+			output += tmp_str + '</ul><div class="panel-footer"><button class="btn btn-default" id="b' + thought.no + '" onclick="showEditor(' + thought.no + ');">Reply</button><div id="e' + thought.no + '" style="display: none;"><textarea id="ta' + thought.no + '" style="width: 800px; height: 100px;"></textarea><br><button class="btn btn-success" onclick="postReply(\'' + group_id + '\', ' + thought.no + ');">Submit</button></div></div></div></div>';
+		}
+		output += '</div>'
+		$('#myContent').append(output);
+		checkMember();
+	});
 }
 
-function show() {
-	$('#test').html($('#editor').val());
+function showEditor(thought_id){
+	tID = 'ta' + thought_id;
+	new nicEditor({fullPanel : true}).panelInstance(tID);
+	$('#e'+thought_id).show();
+	$('#b'+thought_id).hide();
+}
+
+function postReply(group_id, thought_id) {
+	tID = 'ta' + thought_id;
+
+	check_thought_content = nic.findEditor(tID).getContent();;
+
+	nosubmit = 0;
+
+	if(check_thought_content =='') {
+		$('#contentdiv').attr('class','form-group has-error');
+		nosubmit =1;
+	} else {
+		$('#contentdiv').attr('class','form-group');
+	}
+	if(nosubmit==1)return false;
+
+	content = nic.findEditor(tID).getContent();
+	$('#e'+thought_id).hide();
+	$('#b'+thought_id).show();
+
+	url = '/post_group_thought_reply/' + group_id +'/';
+
+	$.post(url, {content: content, thought_id: thought_id, creator_id: user_id})
+		.then(function () {
+			window.location = '/group/' + group_id;
+		});
+}
+
+function postThought(group_id) {
+
+
+	check_thought_title = $('#thought_title').val();
+	check_thought_content = nic.findEditor("thought_content").getContent();;
+
+	nosubmit = 0;
+
+	if(check_thought_content =='') {
+		$('#contentdiv').attr('class','form-group has-error');
+		nosubmit =1;
+	} else {
+		$('#contentdiv').attr('class','form-group');
+	}
+	if(check_thought_title=='') {
+		$('#namediv').attr('class','form-group has-error');
+		nosubmit =1;
+	} else {
+		$('#namediv').attr('class','form-group');
+	}
+	if(nosubmit==1)return false;
+
+	title = document.getElementById("thought_title").value;
+	content = nic.findEditor("thought_content").getContent();
+
+
+	url = '/post_group_thoughts/' + group_id +'/';
+
+	$.post(url, {title: title, content: content, creator_id: user_id})
+		.then(function () {
+			window.location = '/group/' + group_id;
+		});
 }
 
 // Member Tab
 function Group_Member_inf(id){
-	$('#myContent').empty();
-	var str = '/group/' + id + '/member_inf';
-	$.get(str, function(data){
-		console.log(data);
-		var tmp = data.split(";");
-		var member = '';
-		for(var i = 0; i < tmp.length-1; i++) {
-			tmp2 = tmp[i].split(',');
-			img = '<img src="' + tmp2[2] + '"/>';
-			member += '<tr><td>' + tmp2[0] + '</td><td>' + tmp2[1] + '</td><td>' + img + '</td></tr>';
-		}
-		$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>NAME</td><td>EMAIL</td><td>PHOTO</td></tr></thead><tbody>' + member + '</tbody></table>');
-		console.log(data);
-	});
+	if(member) {
+		$('#myContent').empty();
+		var str = '/group/' + id + '/member_inf';
+		$.get(str, function (data) {
+			console.log(data);
+			var tmp = data.split(";");
+			var member = '';
+			for (var i = 0; i < tmp.length - 1; i++) {
+				tmp2 = tmp[i].split(',');
+				img = '<img src="' + tmp2[2] + '"/>';
+				member += '<tr><td>' + tmp2[0] + '</td><td>' + tmp2[1] + '</td><td>' + img + '</td></tr>';
+			}
+			$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>NAME</td><td>EMAIL</td><td>PHOTO</td></tr></thead><tbody>' + member + '</tbody></table>');
+			console.log(data);
+		});
+	} else {
+		alert('Please join the group first!');
+	}
 }
 
 function joinGroup(group_id) {
 	// TODO: implement the action for user to join the displayed group
 	var str = '/group/' + group_id +'/';
-	join_id = Cookies.get('user_id');
-	$.post( str, { group_id : group_id, join_id:join_id })
+	$.post( str, { group_id : group_id, join_id: user_id })
 	.then(function () {
 		  $('#join_group_btn').hide();
 		  window.location = '/group/'+group_id;
@@ -358,15 +470,14 @@ function joinGroup(group_id) {
 }
 
 function setuser_no(){
-	id = Cookies.get('user_id');
-	if(id != undefined){
-		str = '/userno/'+id;
+	if(user_id != undefined){
+		str = '/userno/' + user_id;
 		$.get(str,function(data){
 			  Cookies.set('user_no',data);
 			  });
 	}
 }
-
+/*
 function checkShowAddButton(member){
 	id = Cookies.get('user_id');
 	if(id != undefined){
@@ -384,19 +495,19 @@ function checkShowAddButton(member){
 				}
 			}
 		}
-		
 		if(showbutton == 1){
-			document.getElementById('join_group_btn').style.visibility = 'visible';
+			$('#join_group_btn').show();
+			$('.member-btn').hide();
 		}else{
-			document.getElementById('join_group_btn').style.visibility = 'hidden';
+			$('#join_group_btn').hide();
+			$('.member-btn').show();
 		}
-		
-	}else{
-		document.getElementById('join_group_btn').style.visibility = 'hidden';
-		
+	} else {
+		$('#join_group_btn').show();
+		$('.member-btn').hide();
 	}
 }
-
+*/
 function saveUserInfo() {
 	FB.api('/me',{"fields": "name, email"}, function(response) {
 		   if(response && !response.error) {

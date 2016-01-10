@@ -17,12 +17,15 @@ from StudyGroup.views import post_group_materials
 from StudyGroup.views import send_mail
 from StudyGroup.views import get_mail
 from StudyGroup.views import get_mission
+from StudyGroup.views import get_group_thoughts
+from StudyGroup.views import post_group_thoughts
+from StudyGroup.views import post_group_thought_reply
+from StudyGroup.views import post_file
 from StudyGroup.views import post_mission
 from StudyGroup.views import check_Name
 
 urlpatterns = [
 	url(r'^admin/', include(admin.site.urls)),
-	url(r'^index',index),
 	url(r'^$', index),
 	url(r'^group/(?P<group_id>[0-9]+)/$',group),
 	url(r'^user/(?P<user_id>[0-9]+)/$',user),
@@ -39,6 +42,10 @@ urlpatterns = [
 	url(r'^send_mail/(?P<group_id>[0-9]+)/$',send_mail),
 	url(r'^get_mail/(?P<user_id>[0-9]+)/$',get_mail),
 	url(r'^get_mission/(?P<user_id>[0-9]+)/$',get_mission),
+	url(r'^get_group_thoughts/(?P<group_id>[0-9]+)/$', get_group_thoughts),
+	url(r'^post_group_thoughts/(?P<group_id>[0-9]+)/$', post_group_thoughts),
+	url(r'^post_group_thought_reply/(?P<group_id>[0-9]+)/$', post_group_thought_reply),
+	url(r'^post_file/(?P<group_id>[0-9]+)/$', post_file),
 	url(r'^post_mission/$',post_mission),
 	url(r'^check_Name/(?P<mission_no>[0-9]+)/$',check_Name),
 ]

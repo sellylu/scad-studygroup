@@ -19,14 +19,49 @@
         <script src="{% static 'javascript/moment.min.js' %}"></script>
         <script src="{% static 'javascript/fullcalendar.js' %}"></script>
         <script src="{% static 'javascript/group.js' %}"></script>
+	    <script src="{% static 'javascript/nicEdit.js' %}"></script>
 		<link href="{% static 'stylesheets/jquery-te-1.4.0.css' %}" rel="stylesheet" type="text/css"/>
 		<link href="{% static 'stylesheets/group.css' %}" rel="stylesheet" type="text/css"/>
 		<link href="{% static 'stylesheets/fullcalendar.css' %}" rel="stylesheet" type="text/css"/>
-	    <link href="{% static 'stylesheets/simple-sidebar.css' %}" rel="stylesheet"/>
+	    <link href="{% static 'stylesheets/simple-sidebar.css' %}" rel="stylesheet" type="text/css"/>
 
+	    <script type="text/javascript">
+		    var nic = nicEditors;
+		    bkLib.onDomLoaded(function() { nic.allTextAreas(); });
+
+		    $(document).ready(function() {
+			    $('#datepicker').datepicker({dateFormat:'yy-mm-dd', changeMonth:true, changeYear:true});
+			    // Check whether member
+			    if(user_id != undefined) {
+				    var user_no = Cookies.get('user_no');
+				    if(user_no != undefined) {
+					    var tmp = '{{ group_page_data.group_member }}'.split(',');
+					    member = 0;
+					    for(var i = 0; i < tmp.length ; i++) {
+						    if(user_no == tmp[i])
+							    member = 1;
+					    }
+				    }
+				    if(member){
+					    $('#join_group_btn').hide();
+					    $('.member-btn').show();
+				    }else{
+					    $('#join_group_btn').show();
+					    $('.member-btn').hide();
+				    }
+			    } else {
+				    $('#join_group_btn').show();
+				    $('.member-btn').hide();
+			    }
+			    // Check whether admin
+			    if(user_id != undefined && user_id == '{{ group_page_data.creator }}')
+				    admin = 1;
+
+			});
+	    </script>
 
     </head>
-    <body onload="checkShowLoginDiv();setuser_no();checkShowAddButton('{{group_page_data.group_member}}');showprogress('{{group_page_data.created_time}}','{{ group_page_data.finished_time}}');showNews('{{group_page_data.group_id}}')">
+    <body onload="checkShowLoginDiv(); setuser_no(); showprogress('{{group_page_data.created_time}}','{{ group_page_data.finished_time}}'); showNews('{{group_page_data.group_id}}')">
 
         <!-- Navigation Bar -->
         <nav class="navbar navbar-inverse navbar-fixed-top" id="NavBar">
@@ -39,14 +74,16 @@
 						<li role="presentation" class="active"><a href="#" onclick="showNews('{{group_page_data.group_id}}')">News</a></li>
 						<li role="presentation"><a href="#" onclick="showSchedule('{{group_page_data.group_id}}')">Schedule</a></li>
 						<li role="presentation"><a href="#" onclick="showMaterials('{{group_page_data.group_id}}')">Materials</a></li>
-						<li role="presentation"><a href="#" onclick="showThoughts()">Thoughts</a></li>
+						<li role="presentation"><a href="#" onclick="showThoughts('{{ group_page_data.group_id }}')">Thoughts</a></li>
 						<li role="presentation"><a href="#" onclick="Group_Member_inf('{{ group_page_data.group_id }}');">Members</a></li>
 					</ul>
 
 					<script>    // change active tab
 						$(".nav a").on("click", function(){
-							$(".nav").find(".active").removeClass("active");
-							$(this).parent().addClass("active");
+							if(this.innerHTML != 'Members') {
+								$(".nav").find(".active").removeClass("active");
+								$(this).parent().addClass("active");
+							}
 						});
 					</script>
 
@@ -55,7 +92,12 @@
 						<li><a href="#" onclick="logout();">Log Out</a></li>
 					</ul>
 					<button type="button" class="btn btn-primary navbar-btn navbar-right" id="create_group_button" data-toggle="modal" data-target="#create_group_Modal" style="display: none;">Create Group</button>
-
+					<script>
+						$('#create_group_button').on('click', function() {
+							nic.findEditor("intro").remove();
+							$('#intro').val('');
+						});
+					</script>
 				</div>
             </div>
         </nav>
@@ -97,19 +139,15 @@
 				        <div class="progress">
 		                    <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
-		                <button id="join_group_btn" class="btn btn-lg  btn-success" onclick="joinGroup('{{ group_page_data.group_id }}');" >JOIN</button>
-			            <button type="button" class="btn btn-primary navbar-btn navbar-right" id="send_mail_button" data-toggle="modal" data-target="#send_mail_Modal">Send Mail</button>
+		                <button id="join_group_btn" class="btn btn-lg btn-success" onclick="joinGroup('{{ group_page_data.group_id }}');" >JOIN</button>
+			            <button type="button" class="btn btn-primary member-btn" id="send_mail_button" data-toggle="modal" data-target="#send_mail_Modal">Send Mail</button>
 			        </div>
 		        </div>
 	            <div id="page-content-wrapper">
 		            <!-- Container -->
                     <div class="container-fluid" id="myContent">
-                    </div>
 
-		            <div class="shine">Shine...</div>
-
-<script>
-
+ <!--script>
 $(function(){
 	var i = 14;
     setInterval(flicker,1500);//迴圈閃爍，間隔1秒
@@ -119,7 +157,7 @@ function flicker(){//閃爍函數
 	$('.shine').css('font-size', $('.shine').css('font-size')+1);
 }
 
-</script>
+</script-->
 	            </div>
 	        </div>
         {% endif %}
@@ -139,7 +177,7 @@ function flicker(){//閃爍函數
 					<div class="modal-body">
 						<div id="contentdiv">
 							<label>Content</label>
-							<textarea class="form-control" name="content" id="content" rows="3"></textarea>
+							<textarea class="form-control editor" name="content" id="content" rows="3"></textarea>
 							<hr>
 						</div>
 					</div>
@@ -165,7 +203,7 @@ function flicker(){//閃爍函數
 					<div class="modal-body">
 						<div id="contentdiv">
 							<label>Content</label>
-							<textarea class="form-control" name="news_content" id="news_content" rows="3"></textarea>
+							<textarea class="form-control editor" name="news_content" id="news_content" rows="3"></textarea>
 							<hr>
 						</div>
 					</div>
@@ -192,13 +230,40 @@ function flicker(){//閃爍函數
 					<div class="modal-body">
 						<div id="contentdiv">
 							<label>Content</label>
-							<textarea class="form-control" name="materials_content" id="materials_content" rows="3"></textarea>
+							<textarea class="form-control editor" name="materials_content" id="materials_content" rows="3"></textarea>
 							<hr>
 						</div>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 						<button type="button" class="btn btn-primary" onclick="add_materials('{{group_page_data.group_id}}')">Post</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <!-- New Thought Modal -->
+		<div id="new_thoughts_Modal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<div id="namediv">
+							<h4 class="modal-title">Title</h4>
+							<input type="text" class="form-control" name="thought_title" id="thought_title" placeholder="Title">
+						</div>
+					</div>
+					<div class="modal-body">
+						<div id="contentdiv">
+							<label>Content</label>
+							<textarea class="form-control editor" name="thought_content" id="thought_content" rows="3"></textarea>
+							<hr>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="postThought('{{group_page_data.group_id}}')">Post</button>
 					</div>
 				</div>
 			</div>
@@ -234,7 +299,7 @@ function flicker(){//閃爍函數
 							<div id="timediv" class="col-md-4">
 								<label>結束時間</label>
 								<div>
-									<input id="finished_time_date" type="date">
+									<input id="datepicker" type="text">
 								</div>
 							</div>
 						</div>
