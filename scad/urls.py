@@ -23,6 +23,7 @@ from StudyGroup.views import post_group_thought_reply
 from StudyGroup.views import post_file
 from StudyGroup.views import post_mission
 from StudyGroup.views import check_Name
+from StudyGroup.views import set_mail_read
 
 urlpatterns = [
 	url(r'^admin/', include(admin.site.urls)),
@@ -40,6 +41,7 @@ urlpatterns = [
 	url(r'^get_group_materials/(?P<group_id>[0-9]+)/$',get_group_materials),
 	url(r'^post_group_materials/(?P<group_id>[0-9]+)/$',post_group_materials),
 	url(r'^send_mail/(?P<group_id>[0-9]+)/$',send_mail),
+	url(r'^set_mail_read/(?P<user_id>[0-9]+)/$',set_mail_read),
 	url(r'^get_mail/(?P<user_id>[0-9]+)/$',get_mail),
 	url(r'^get_mission/(?P<user_id>[0-9]+)/$',get_mission),
 	url(r'^get_group_thoughts/(?P<group_id>[0-9]+)/$', get_group_thoughts),

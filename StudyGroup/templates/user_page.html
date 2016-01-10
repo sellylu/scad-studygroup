@@ -7,21 +7,20 @@
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
 		
 		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"/>
 		<link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons"/>
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"/>
 		{% load static %}
-
-		
-		
-        <link href="{% static 'stylesheets/user.css' %}" rel="stylesheet" type="text/css">
-        <link href="{% static 'stylesheets/simple-sidebar.css' %}" rel="stylesheet" type="text/css">
-        <link href="{% static 'stylesheets/jquery.fancybox.css' %}" rel="stylesheet" type="text/css">
-        <script src="{% static 'javascript/js_cookie.js'  %}"></script>
+		<script src="{% static 'javascript/js_cookie.js'  %}"></script>
         <script src="{% static 'javascript/jquery.fancybox.js'  %}"></script>
 
+        <link href="{% static 'stylesheets/simple-sidebar.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'stylesheets/jquery.fancybox.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'stylesheets/user.css' %}" rel="stylesheet" type="text/css">
+        
         <script type="text/javascript">
         	var ans;
             $(document).ready(function() {
@@ -211,7 +210,8 @@
 
                 $('#myContent').append(div);
             }
-            function showMailbox() {
+            
+	     	function showMailbox() {
 	            $('#myContent').empty();
 
 	            user_id = Cookies.get('user_id');
@@ -222,20 +222,55 @@
 					var news = '';
 					for(var i = 0; i < tmp.length-1; i++) {
 						tmp2 = tmp[i].split(',');
-						mail_title = tmp2[0];
-						mail_content = tmp2[1];
-						mail_created_time = tmp2[2];
-						news += '<tr onclick="displayContent(' + i + ')"><td>' + mail_created_time + '</td><td>' + mail_title + '</td></tr>' + '<tr class="news_content" id=' + i + '><td colspan="2">' + mail_content + '</td></tr>';
+						mail_no = tmp2[0];
+						mail_title = tmp2[1];
+						mail_content = tmp2[2];
+						mail_created_time = tmp2[3];
+						mail_read = tmp2[4];
+						
+						if(mail_read == 'y') {
+							news += '<tr class="mail_read" id="mail_' + mail_no + 'onclick="displayContent(' + mail_no + ')"><td width="10px"></td><td width="200px">' + mail_created_time + '</td><td>' + mail_title + '</td></tr>' + '<tr style="display:none;" id=' + mail_no + '><td colspan="2">' + mail_content + '</td></tr>';
+						}
+						else {
+							news += '<tr class="mail_unread" id="mail_' + mail_no + '" onclick="displayContent(' + mail_no + ')"><td width="10px" id="check_read_' + mail_no + '">+</td><td width="200px">' + mail_created_time + '</td><td>' + mail_title + '</td></tr>' + '<tr style="display:none;" id=' + mail_no + '><td colspan="2">' + mail_content + '</td></tr>';
+						}
+
 					}
-					$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>CONTENT</td></tr></thead><tbody>' + news + '</tbody></table>');
+					$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td width="10px"></td><td width="200px">DATE</td><td>CONTENT</td></tr></thead><tbody>' + news + '</tbody></table>');
 					console.log(data);
 				});
             }
 	        function displayContent(id) {
-		        if(document.getElementById(id).style.display == "none")
-			        $('#'+id).show();
-		        else
-			        document.getElementById(id).style.display = "none";
+	        	
+			    if($('#mail_'+id).attr('class') == 'mail_unread') {
+			    	
+			    	if(document.getElementById(id).style.display == "none") {
+			    		$('#'+id).show();
+					}
+			        else{
+				        document.getElementById(id).style.display = "none";
+			       
+			   		}
+		        	
+			    	$('#mail_'+id).attr('class', 'mail_read');
+	            	$('#check_read_'+id).html('');
+
+	            	user_id = Cookies.get('user_id');
+	            	str = '/set_mail_read/' + user_id + '/';
+	            	$.post(str, { mail_no: id});
+			    }
+			    else {
+			    	if(document.getElementById(id).style.display == "none") {
+			    		$('#'+id).show();
+					}
+			        else{
+				        document.getElementById(id).style.display = "none";
+			       
+			   		}			    	
+			    }
+
+			    
+		        
 	        }
 
         </script>

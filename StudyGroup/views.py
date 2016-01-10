@@ -322,6 +322,27 @@ def post_group_materials(request,group_id):
 	return HttpResponseRedirect('/group/{}'.format(group_id))
 
 @csrf_exempt
+def set_mail_read(request,user_id):
+	if request.method == 'POST':
+		mail_no = request.POST['mail_no']
+
+		get_unread_mail_sql = "SELECT mail_unread FROM user WHERE user_id ='%s'" % user_id
+		cursor = connection.cursor()
+		cursor.execute(get_unread_mail_sql)
+		data = cursor.fetchone()[0][:-1].split(',')
+		newdata = ''
+		for d in data:
+			if mail_no != d:
+				newdata = newdata + d + ','
+		
+
+		set_new_unread_sql = "UPDATE user SET mail_unread = '%s' WHERE user_id = '%s'" % (newdata,user_id)
+		cursor.execute(set_new_unread_sql)
+		return HttpResponse()
+
+
+
+@csrf_exempt
 def send_mail(request,group_id):
 	if request.method == 'POST':
 
@@ -333,46 +354,65 @@ def send_mail(request,group_id):
 		content = strcheck(content)
 
 		t = time.time()
+
 		created_time = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d')
 
+
 		cursor = connection.cursor()
-		insertmailboxsql = "INSERT INTO mailbox(creator_id,title,content,created_time,group_id) VALUES('%s','%s','%s','%s','%s')" % (creator_id,title,content,created_time,group_id)
+		insertmailboxsql = "INSERT INTO mailbox(creator_id,title,content,created_time,group_id,checkno) VALUES('%s','%s','%s','%s','%s','%s')" % (creator_id,title,content,created_time,group_id,t)
 		cursor.execute(insertmailboxsql)
 
-		get_mail_no = "SELECT no FROM mailbox WHERE group_id = '%s' " % (group_id)
+		get_mail_no = "SELECT no FROM mailbox WHERE checkno = '%s' " % (t)
 		cursor.execute(get_mail_no)
-		mail_no = cursor.fetchall()
+		mail_no = cursor.fetchone()[0]
 
-		no_str = ''
-		for no in mail_no:
-			no_str = no_str + str(no[0])+ ','
+		print(mail_no)
 
 		getgroup_member_sql = "SELECT group_member FROM study_group WHERE group_id = '%s'" % (group_id)
 		cursor.execute(getgroup_member_sql)
 		tmp_member = cursor.fetchone()[0][:-1]
 		group_member = tmp_member.split(',')
-
 		for member in group_member:
-			update_mail_sql = "UPDATE  user SET mail = '%s' WHERE no = '%d' " %(no_str,int(member))
-			cursor.execute(update_mail_sql)
+
+			get_mail = "SELECT mail,mail_unread FROM user WHERE no ='%d'" %(int(member))
+			cursor.execute(get_mail)
+			data = cursor.fetchone()
+
+			mail_data = data[0] + str(mail_no) + ','
+			mail_unread = data[1] + str(mail_no) + ','
+
+			update_mail_sql = "UPDATE  user SET mail = '%s' WHERE no = '%d' " %(mail_data,int(member))
+			cursor.execute(update_mail_sql) 
+
+			update_mail_unread_sql = "UPDATE  user SET mail_unread = '%s' WHERE no = '%d' " %(mail_unread,int(member))
+			cursor.execute(update_mail_unread_sql)
+
 		return HttpResponseRedirect('/group/{}'.format(group_id))
 
 
 def get_mail(request,user_id):
 
 	cursor = connection.cursor()
-	get_all_mail_no_sql = "SELECT mail FROM  user WHERE user_id = '%s'" %(user_id)
+	get_all_mail_no_sql = "SELECT mail,mail_unread FROM user WHERE user_id = '%s'" %(user_id)
 
 	cursor.execute(get_all_mail_no_sql)
-	all_mail_no = cursor.fetchone()[0][:-1]
+	data = cursor.fetchone()
+	print(data)
+	unread = data[1][:-1].split(',')
+	all_mail_no = data[0][:-1]
+	
 	split_no = all_mail_no.split(',')
 	data = ''
 	for no in split_no:
 		get_mail_content_sql = "SELECT * FROM mailbox WHERE no = '%d'" %(int(no))
 		cursor.execute(get_mail_content_sql)
-
+		if no in unread:
+			tag = 'n'
+		else:
+			tag = 'y'
+		print(no,tag)
 		tmp_data = cursor.fetchone()
-		tmp2_data = tmp_data[3]+','+tmp_data[4]+','+tmp_data[5] +';'
+		tmp2_data = str(no) + ',' + tmp_data[3]+','+tmp_data[4]+','+tmp_data[5] + ','+ tag + ';';
 
 		data = data + tmp2_data
 	return HttpResponse(data)
