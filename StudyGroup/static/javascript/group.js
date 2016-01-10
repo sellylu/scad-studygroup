@@ -377,6 +377,8 @@ function checkShowAddButton(member){
 			var tmp = member.split(',');
 			showbutton = 1;
 			for(i=0;i<tmp.length;i++){
+				alert(tmp[i]);
+				alert(user_no);
 				if(user_no == tmp[i]){
 					showbutton = 0;
 				}
