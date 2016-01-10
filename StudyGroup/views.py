@@ -294,27 +294,31 @@ def get_group_materials(request,group_id):
 	data = cursor.fetchall()
 
 	post_content = ''
-	for content in data:
-		post_content = content[1] + content[2]+',' +content[3] + ',' + content[4] + ';'
+	if data:
+		for material in data:
+			get_user_sql = "SELECT name FROM  user WHERE user_id = '%s'" % material[6]
+			cursor.execute(get_user_sql)
+			data1 = cursor.fetchone()
+			if data1:
+				post_content += str(material[0]) + ',' + material[3] + ',' + material[4] + ',' + material[5] + ',' + data1[0] + ';'
+			else:
+				post_content += str(material[0]) + ',' + material[3] + ',' + material[4] + ',' + material[5] + ',0;'
 
+	print(post_content)
 	return HttpResponse(post_content)
 
 
 @csrf_exempt
 def post_group_materials(request,group_id):
 
-	title = request.POST['title']
-	content = request.POST['content']
+	title = strcheck(request.POST['title'])
+	content = strcheck(request.POST['content'])
+	creator_id = request.POST['creator_id']
 	t = time.time()
 	date = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d')
 	cursor = connection.cursor()
-
-	title = strcheck(title)
-	content = strcheck(content)
-
-	post_group_materialsql = "INSERT INTO material(group_id,title,content,created_time) VALUES('%s','%s','%s','%s')" % (group_id,title,content,date);
-	cursor.execute(post_group_materialsql)
-
+	post_materials_sql = "INSERT INTO material(group_id, title, content, created_time, creator_id) VALUES('%s','%s','%s','%s','%s')" % (group_id, title, content, date, creator_id)
+	cursor.execute(post_materials_sql)
 	return HttpResponseRedirect('/group/{}'.format(group_id))
 
 @csrf_exempt

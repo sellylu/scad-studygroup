@@ -55,11 +55,14 @@ a:hover {
 
 body {
 	background-image: url("../images/bg.png");
+	height: 100%;
+	padding-top: 30px;
+	padding-bottom: 70px;
+	font-size:14px;
 }
 
 footer {
 	background-color: #000;
-	padding-top: 15px;
 }
 /* Header */
 header {
