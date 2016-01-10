@@ -334,7 +334,9 @@ function add_materials(group_id) {
 	url = '/post_group_materials/' + group_id +'/';
 	$.post( url, {title : title, content: content, creator_id: user_id})
 		.then(function () {
-			window.location = '/group/'+group_id;
+			
+			$('#add_materials_Modal').modal('hide');
+			showMaterials(group_id);
 	});
 }
 
@@ -446,7 +448,9 @@ function postThought(group_id) {
 
 	$.post(url, {title: title, content: content, creator_id: user_id})
 		.then(function () {
-			window.location = '/group/' + group_id;
+			
+			$('#new_thoughts_Modal').modal('hide');
+			showThoughts(group_id);
 		});
 }
 
