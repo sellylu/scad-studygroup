@@ -581,6 +581,35 @@ def post_file(requext, group_id):
 	return HttpResponseRedirect('/group/{}'.format(group_id))
 
 
+def get_my_group(request,user_id):
+	
+	cursor = connection.cursor()
+	selectsql = "SELECT join_group FROM  user WHERE user_id = '%s'" %(user_id)
+	cursor.execute(selectsql)
+
+	
+	user_group = cursor.fetchone()[0][:-1]
+	print('here')
+	if user_group == '':
+		return HttpResponse('')
+	else:
+		getgroupinfosql = "SELECT group_id,group_name,intro,created_time,finished_time,member_limit,member_num,creator FROM study_group WHERE no in ("+user_group+")"
+		cursor.execute(getgroupinfosql)
+		
+		group_data = cursor.fetchall()
+		#print(group_data[0][0])
+		data_list = ''
+		for x in group_data:
+			print(x)
+			get_user_sql = "SELECT name FROM  user WHERE user_id = '%s'" % x[7]
+			cursor.execute(get_user_sql)
+			tmp = cursor.fetchone()[0]
+			data_list = data_list + str(x[0]) + ',' + str(x[1]) + ',' + str(x[2]) + ',' + str(x[3]) + ',' + str(x[4]) + ',' + str(x[5]) + ',' + str(x[6]) + ',' + tmp+ ';'
+			#data_list = data_list + group_data[x][0]
+		#print(data_list)
+		print(data_list)
+		return HttpResponse(data_list)
+
 def strcheck(string):
 
 	if '"' in string:
