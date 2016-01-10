@@ -42,14 +42,22 @@
                 $('#myContent').empty();
                 {% if user_achievement_data %}
 	                login_achievement_div = $('<div/>', {
-	                    'class': 'login_achievement'
+	                    'class': 'achievement_div'
 	                }).html('<h4>Login Achievement</h4>');
+	                post_achievement_div = $('<div/>', {
+	                    'class': 'achievement_div'
+	                }).html('<h4>Post Achievement</h4>');	                
+	                create_achievement_div = $('<div/>', {
+	                    'class': 'achievement_div'
+	                }).html('<h4>Create Group Achievement</h4>');  
 
 	                login_achieve=[];
 	                login_achieve_pic=[['badge-5_nos_black.png','badge-5_nos.png'],['badge-10_nos_black.png','badge-10_nos.png'],['badge-15_nos_black.png','badge-15_nos.png'],['badge-20_nos_black.png','badge-20_nos.png']];
+	                post_achieve=[];
+	                post_achieve_pic=[['postTime_1_black.png','postTime_1.png'],['postTime_5_black.png','postTime_5.png'],['postTime_10_black.png','postTime_10.png'],['postTime_20_black.png','postTime_20.png']];	                
 
-					user_login_cnt = '{{user_achievement_data.user_login_cnt}}';
-					alert(user_login_cnt);
+	                // user login achievement
+					user_login_cnt = {{user_achievement_data.user_login_cnt}};
 	               	if(user_login_cnt >=0 && user_login_cnt <= 4)
 	               		login_achieve = [0,0,0,0];
 	               	else if(user_login_cnt >=5 && user_login_cnt <= 9)
@@ -68,8 +76,45 @@
 		                    width: 150
 		                }).appendTo(login_achievement_div);
 	               	}
+
+	                // user post achievement
+					user_post_cnt = {{user_achievement_data.user_post_int}};
+	               	if(user_post_cnt ==0)
+	               		post_achieve = [0,0,0,0];
+	               	else if(user_post_cnt >=1 && user_post_cnt <= 4)
+	               		post_achieve = [1,0,0,0];
+	               	else if(user_post_cnt >=5 && user_post_cnt <= 9)
+	               		post_achieve = [1,1,0,0];
+	               	else if(user_post_cnt >=10 && user_post_cnt <= 19)
+	               		post_achieve = [1,1,1,0];	               		
+	               	else if(user_post_cnt >=20)
+	               		post_achieve = [1,1,1,1];
+	               	
+	               	for(i = 0; i < 4; i++) {
+		                $('<img/>', {
+		                    'class': 'achievement',
+		                    src: '{% static "images/' + post_achieve_pic[i][post_achieve[i]] + '" %}',
+		                    width: 150
+		                }).appendTo(post_achievement_div);
+	               	}
+	                
+	                {% if user_achievement_data.user_created_achieve == 0%}
+		                $('<img/>', {
+		                    'class': 'achievement',
+		                    src: '{% static "images/trophy_black.png" %}',
+		                    width: 150
+		                }).appendTo(create_achievement_div);	                	
+	                {% else %}
+		                $('<img/>', {
+		                    'class': 'achievement',
+		                    src: '{% static "images/trophy.png" %}',
+		                    width: 150
+		                }).appendTo(create_achievement_div);	                
+	                {% endif %}
 	                
 	                $('#myContent').append(login_achievement_div);
+	                $('#myContent').append(post_achievement_div);
+	                $('#myContent').append(create_achievement_div);
 	            {% endif %}
             }
 
