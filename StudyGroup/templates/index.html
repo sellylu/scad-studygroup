@@ -77,7 +77,7 @@
 				<!-- TODO: creator name + member number-->
 				{% if group_data %}
 					{% for group in group_data %}
-						{% if group.private == 0%}
+						{% if group.private == 0 %}
 						<div class="col-md-4">
 							<div class="panel panel-warning">
 								<div class="panel-heading">
@@ -89,9 +89,13 @@
 									<p align="center">{{ group.intro }}</p>
 									<hr>
 									<p>
-									Period: {{ group.created_time }} ~ {{ group.finished_time }}<br>
-									Member: {{ group.member_num }} / {{ group.member_limit }}<br>
-									Creator: {{ group.creator }}
+									<b>Period:</b> {{ group.created_time }} ~ {{ group.finished_time }}<br>
+										{% if group.member_limit == 0 %}
+											<b>Number of Members and Limitation:</b> {{ group.member_num }} / ∞<br>
+										{% else %}
+											<b>Number of Members and Limitation:</b> {{ group.member_num }} / {{ group.member_limit }}<br>
+										{% endif %}
+									<b>Creator:</b> {{ group.creator }}
 									</p>
 								</div>
 							</div>
@@ -181,12 +185,11 @@
 		</div>
 
 		<!-- Footer -->
-        <footer>
-            <ul>
-                <li class="copyright" type="none" align="center" style="color: #eee;vertical-align:middle;">Copyright © 2015 Study Group ALL Rights Reserved.</li>
-            </ul>
-            <br class="space">
-        </footer>
+        <nav class="navbar navbar-inverse navbar-fixed-bottom">
+			<ul>
+		        <li class="copyright" type="none" align="center" style="color: #eee;vertical-align:middle;">Copyright © 2015 Study Group ALL Rights Reserved.</li>
+	        </ul>
+        </nav>
 
     </body>
 

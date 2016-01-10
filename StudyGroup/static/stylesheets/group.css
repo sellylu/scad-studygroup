@@ -82,7 +82,7 @@ header {
 }
 
 #calendar {
-  width: inherit;
+  width: 90%;
   margin: auto;
 }
 
@@ -100,7 +100,6 @@ header {
 	margin-top: 0px;
 }
 
-
 .thought-info {
 	font-size: 14px;
 }
@@ -116,4 +115,11 @@ header {
 }
 .nicEdit-main {
 	height: 100px;
+}
+
+.member-btn {
+	display: none;
+}
+.admin-btn {
+	display: none;
 }
