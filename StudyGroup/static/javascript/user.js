@@ -45,7 +45,7 @@ var ans;
 	            $.post( "/", { group_id : group_id, group_name : group_name,  member_limit :member_limit,intro:intro,private:private,creator_id:creator_id ,finished_time:finished_time})
 			            .then(function () {
 				            window.location = '/group/'+group_id;
-			            });
+			    });
             }
             function logout() {
 	            Cookies.remove('user_id');
@@ -61,19 +61,22 @@ var ans;
 				$.get(str, function(data){
 
 					mission_list = data.split(',');
-					var mission ='';
-					for(var i = 0; i < mission_list.length; i++) {
-						mission_no = mission_list[i];
-						mission = '<a class="missionBox" href="#name_checking_div" onclick="renderMission(' + mission_no + ')"><div class="list-group-item row"><h4 align="center">Mission from System</h4></div></a>';
-						
-					}
+					if(mission_list != ''){
+						var mission ='';
+						for(var i = 0; i < mission_list.length; i++) {
+							mission_no = mission_list[i];
+							mission = '<div id="' + mission_no + '"><a class="missionBox" href="#name_checking_div" onclick="renderMission(' + mission_no + ')"><div class="list-group-item row"><h4 align="center">Mission from System</h4></div></a></div>';
+						}
 
-					$('#myContent').append(mission);
+						$('#myContent').append(mission);
+					}
 					console.log(data);
+
 				});
             }
 
 			function renderMission(mission_no) {
+				
 				$("#name_checking_div").empty();
 					
 				str = '/check_Name/' + mission_no.toString()+ '/';
@@ -93,8 +96,7 @@ var ans;
 					name_list = tmp[1].split(',');
 					name = '';
 		            for(i = 0; i < name_list.length-1; i++) {
-		            	name += '<button type="button" onclick="checkAns(\'' + name_list[i] + '\')">' + name_list[i] + '</button>';
-		            }
+		            	name += '<button type="button" onclick="checkAns(\'' + name_list[i] + '\',' + mission_no + ')">' + name_list[i] + '</button>'; }
 		            
 					ans = tmp[2];
 
@@ -110,13 +112,21 @@ var ans;
 		        });
 			}
 
-			function checkAns (input) {
+			function checkAns (input, mission_no) {
 				if(input == ans) {
-					alert('you got it right');	
+					alert('you got it right');
+					correct = 1;
 				}
 				else {
-					alert('wrong answerQQ')
+					alert('wrong answerQQ');
+					correct = 0;
 				}
+
+				user_id = Cookies.get('user_id');
+ 	            str = '/mission_complete/' + user_id + '/';					
+				$.post(str, {user_id: user_id, mission_no: mission_no, correct: correct});								
+				parent.$.fancybox.close();	
+				$('#'+mission_no).remove();
 			}
 
 
@@ -177,3 +187,43 @@ var ans;
  			   		}			    	
  			    }
 	        }
+
+
+var show_mail_button_interval;
+var start = 0;
+function check_mail_init(user_id){
+    
+
+    self.setInterval('check_mail(user_id)',5000); 
+    //check_mail(user_id);
+  
+}
+function check_mail(user_id){
+    url = '/check_mail/' + user_id + '/'
+    $.get(url,function(data){
+    	if(data == 'y'){
+        	// alert('y');
+        	if(start ==0){
+        		$('#show_mail_button').show();
+            	show_mail_button_interval = setInterval(flicker,3000);
+            	start =1;
+        	}
+        }
+        else{
+        	// alert('n');
+        	start = 0;
+        	$('#show_mail_button').hide();
+            clearInterval(show_mail_button_interval);
+            // alert('clear');
+        } 
+        
+        });
+    
+}
+function flicker(){//閃爍函數
+        $('#show_mail_button').fadeOut(750).fadeIn(750);
+}
+
+
+
+

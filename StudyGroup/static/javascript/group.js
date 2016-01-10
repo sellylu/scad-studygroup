@@ -8,8 +8,9 @@ var admin = 0;
 
 
 function checkShowLoginDiv() {
-	if(user_id != undefined)
+	if(user_id != undefined){
 		adjustCSS();
+	}
 }
 
 function adjustCSS() {
@@ -491,7 +492,8 @@ function setuser_no(){
 		str = '/userno/' + user_id;
 		$.get(str,function(data){
 			  Cookies.set('user_no',data);
-			  });
+		});
+		check_mail_init(user_id);
 	}
 }
 /*
@@ -585,3 +587,41 @@ window.fbAsyncInit = function() {
 			version    : 'v2.5'
 			});
 };
+
+
+
+var show_mail_button_interval;
+var start = 0;
+function check_mail_init(user_id){
+    
+
+    self.setInterval('check_mail(user_id)',5000); 
+    //check_mail(user_id);
+  
+}
+function check_mail(user_id){
+    url = '/check_mail/' + user_id + '/'
+    $.get(url,function(data){
+    	if(data == 'y'){
+        	// alert('y');
+        	if(start ==0){
+        		$('#show_mail_button').show();
+            	show_mail_button_interval = setInterval(flicker,3000);
+            	start =1;
+        	}
+        }
+        else{
+        	// alert('n');
+        	start = 0;
+        	$('#show_mail_button').hide();
+            clearInterval(show_mail_button_interval);
+            // alert('clear');
+        } 
+        
+        });
+    
+}
+function flicker(){//閃爍函數
+        $('#show_mail_button').fadeOut(750).fadeIn(750);
+}
+

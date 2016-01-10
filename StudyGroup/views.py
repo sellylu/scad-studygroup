@@ -438,7 +438,7 @@ def get_mail(request,user_id):
 
 	cursor.execute(get_all_mail_no_sql)
 	data = cursor.fetchone()
-	
+	print(data)
 	unread = data[1][:-1].split(',')
 	all_mail_no = data[0][:-1]
 	
@@ -456,7 +456,7 @@ def get_mail(request,user_id):
 		tmp2_data = str(no) + ',' + tmp_data[3]+','+tmp_data[4]+','+tmp_data[5] + ','+ tag + ';';
 
 		data = data + tmp2_data
-	print('hhahh' + '  ' + data)
+	
 	return HttpResponse(data)
 
 
@@ -513,11 +513,11 @@ def post_mission(request):
 		insert_mission_sql = "INSERT INTO mission(question_user_id,question_name,ans,time) VALUES ('%s','%s','%s','%s')" % (question_user_id,name_list_string,ans_name,t)
 		cursor.execute(insert_mission_sql)
 
+		print('ffff' )
 		#get mission no
 		get_mission = "SELECT no FROM mission WHERE time ='%s'" % t
 		cursor.execute(get_mission)
 		mission_no = cursor.fetchone()[0]
-
 		#insert mission to user
 
 		for m in member_list:
@@ -536,12 +536,12 @@ def post_mission(request):
 
 
 def get_mission(request,user_id):
-
+	print(user_id)
 	get_user_mission = "SELECT mission FROM  user WHERE user_id='%s'" % user_id
 	cursor = connection.cursor()
 	cursor.execute(get_user_mission)
 	mission_str = cursor.fetchone()[0][:-1]
-	
+	print(mission_str)
 	return HttpResponse(mission_str)
 
 
@@ -698,6 +698,48 @@ def check_mail(request,user_id):
 	
 	else:
 		return HttpResponse('n')
+
+
+
+@csrf_exempt
+def mission_complete(request,user_id):
+	mission_no = request.POST['mission_no']
+	correct = request.POST['correct']
+
+	get_user_data_sql = "SELECT exp,mission FROM user WHERE user_id = '%s'" % (user_id)
+	cursor = connection.cursor()
+	cursor.execute(get_user_data_sql)
+	data = cursor.fetchone()
+	if correct == 1:	# correct answer
+		exp = data[0]
+
+		if 15<=exp+1 <= 49:
+			update_user_achievement_sql = "UPDATE user SET exp = exp + 5, level = 1 WHERE user_id = '%s'" % (user_id)
+		elif 50<=exp+1 <= 89:
+			update_user_achievement_sql = "UPDATE user SET exp = exp + 5, level = 2 WHERE user_id = '%s'" % (user_id)
+		elif 90<=exp+1 <= 139:
+			update_user_achievement_sql = "UPDATE user SET exp = exp + 5, level = 3 WHERE user_id = '%s'" % (user_id)
+		elif 140<=exp+1 :
+			update_user_achievement_sql = "UPDATE user SET exp = exp + 5, level = 4 WHERE user_id = '%s'" % (user_id)
+		else:
+			update_user_achievement_sql = "UPDATE user SET exp = exp + 5 WHERE user_id = '%s'" % (user_id)
+
+		cursor.execute(update_user_achievement_sql)
+
+	mission_list = data[1][:-1].split(',')
+	if mission_no in mission_list:	# remove completed mission
+		mission_list.remove(mission_no)
+	print(mission_list)
+
+	new_mission_list = ''
+	for mission in mission_list:
+		new_mission_list = new_mission_list + mission + ','
+	print(new_mission_list)
+
+	update_user_mission_sql = "UPDATE user SET mission = '%s' WHERE user_id = '%s'" % (new_mission_list,user_id)
+	cursor.execute(update_user_mission_sql)
+	
+	return HttpResponse("hello")
 def strcheck(string):
 
 	if '"' in string:
