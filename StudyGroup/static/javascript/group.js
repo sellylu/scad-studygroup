@@ -252,24 +252,26 @@ function showSchedule(group_id) {
 								},
 								
 								dayClick: function(date, allDay, jsEvent, view) {
-								var title = prompt('Add new event');
-								if(title){
-								var d = new Date(date);
-								var year = d.getFullYear();
-								var month = (d.getMonth()+1);
-								var date = d.getDate();
-								if(month<10) month='0'+month;
-								if(date<10)date='0'+date;
-								var datetime = year + '-' + month + '-' + date;
-								
-								url = '/postcalendarevent/' + group_id +'/';
-								$.post(url, { title:title,start: datetime}).
-								then(function(){
-									 showSchedule(group_id);
-									 });
+									if (member) {
+										var title = prompt('Add new event');
+										if (title) {
+											var d = new Date(date);
+											var year = d.getFullYear();
+											var month = (d.getMonth() + 1);
+											var date = d.getDate();
+											if (month < 10) month = '0' + month;
+											if (date < 10)date = '0' + date;
+											var datetime = year + '-' + month + '-' + date;
+
+											url = '/postcalendarevent/' + group_id + '/';
+											$.post(url, {title: title, start: datetime}).
+											then(function () {
+												showSchedule(group_id);
+											});
+										}
+									}
 								}
-								}
-								});
+	});
 	
 }
 
@@ -277,24 +279,33 @@ function showSchedule(group_id) {
 function showMaterials(group_id) {
 	$('#myContent').empty();
 
-	$('#myContent').append('<button type="button" class="btn btn-primary member-btn" id="add_materials_button" data-toggle="modal" data-target="#add_materials_Modal">Add Materials</button>');
-	var str = '/get_group_materials/' + group_id;
+	var newMaterial_str = '<button class="btn btn-success member-btn" id="add_materials_button" data-toggle="modal" data-target="#add_materials_Modal" style="width: auto"><i class="glyphicon glyphicon-plus"/>Add Material</button><br class="space">';
+	var output = newMaterial_str + '<div class="panel-group">';
 
-	$.get(str, function(data){
-		var tmp = data.split(";");
-		var materials = '';
-		for(var i = 0; i < tmp.length-1; i++) {
-			tmp2 = tmp[i].split(',');
-			materials_date = tmp2[0];
-			materials_title = tmp2[1];
-			materials_content = tmp2[2];
-			materials += '<tr onclick="displayContent(' + i + ')"><td>' + materials_date + '</td><td>' + materials_title + '</td></tr>' + '<tr class="news_content" id=' + i + '><td colspan="2">' + materials_content + '</td></tr>';
+	$.get('/get_group_materials/' + group_id + '/', function(data) {
+
+		data = data.split(";");
+		for (var i = 0; i < data.length - 1; i++) {
+			tmp = data[i].split(',');
+			var material = {
+				'no': tmp[0],
+				'date': tmp[1],
+				'title': tmp[3],
+				'content': tmp[2],
+				'creator': tmp[4]
+			};
+			output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#m' + material.no + '" data-toggle="collapse">'
+				+ material.title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + material.date + ' by ' + material.creator + '</div></div></div>'
+				+ '<div class="panel-collapse collapse" id="m' + material.no + '">';
+			output += '<div class="panel-body">' + material.content + '</div></div></div>';
 		}
-
-		$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>CONTENT</td></tr></thead><tbody>' + materials + '</tbody></table>');
+		output += '</div>';
+		$('#myContent').append(output);
 		console.log(data);
 		checkMember();
 	});
+
+
 }
 
 function add_materials(group_id) {
@@ -321,7 +332,7 @@ function add_materials(group_id) {
 	content = nic.findEditor("materials_content").getContent();
 
 	url = '/post_group_materials/' + group_id +'/';
-	$.post( url, {title : title, content: content})
+	$.post( url, {title : title, content: content, creator_id: user_id})
 		.then(function () {
 			window.location = '/group/'+group_id;
 	});
@@ -365,7 +376,7 @@ function showThoughts(group_id) {
 			}
 			output += tmp_str + '</ul><div class="panel-footer"><button class="btn btn-default" id="b' + thought.no + '" onclick="showEditor(' + thought.no + ');">Reply</button><div id="e' + thought.no + '" style="display: none;"><textarea id="ta' + thought.no + '" style="width: 800px; height: 100px;"></textarea><br><button class="btn btn-success" onclick="postReply(\'' + group_id + '\', ' + thought.no + ');">Submit</button></div></div></div></div>';
 		}
-		output += '</div>'
+		output += '</div>';
 		$('#myContent').append(output);
 		checkMember();
 	});
