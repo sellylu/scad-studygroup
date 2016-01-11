@@ -23,6 +23,11 @@ from StudyGroup.views import post_group_thought_reply
 from StudyGroup.views import post_file
 from StudyGroup.views import post_mission
 from StudyGroup.views import check_Name
+from StudyGroup.views import set_mail_read
+from StudyGroup.views import get_my_group
+from StudyGroup.views import check_mail
+from StudyGroup.views import mission_complete
+from StudyGroup.views import get_user_experience
 
 urlpatterns = [
 	url(r'^admin/', include(admin.site.urls)),
@@ -40,6 +45,7 @@ urlpatterns = [
 	url(r'^get_group_materials/(?P<group_id>[0-9]+)/$',get_group_materials),
 	url(r'^post_group_materials/(?P<group_id>[0-9]+)/$',post_group_materials),
 	url(r'^send_mail/(?P<group_id>[0-9]+)/$',send_mail),
+	url(r'^set_mail_read/(?P<user_id>[0-9]+)/$',set_mail_read),
 	url(r'^get_mail/(?P<user_id>[0-9]+)/$',get_mail),
 	url(r'^get_mission/(?P<user_id>[0-9]+)/$',get_mission),
 	url(r'^get_group_thoughts/(?P<group_id>[0-9]+)/$', get_group_thoughts),
@@ -48,6 +54,11 @@ urlpatterns = [
 	url(r'^post_file/(?P<group_id>[0-9]+)/$', post_file),
 	url(r'^post_mission/$',post_mission),
 	url(r'^check_Name/(?P<mission_no>[0-9]+)/$',check_Name),
+	url(r'^get_my_group/(?P<user_id>[0-9]+)/$',get_my_group),
+	url(r'^check_mail/(?P<user_id>[0-9]+)/$',check_mail),
+	url(r'^mission_complete/(?P<user_id>[0-9]+)/$',mission_complete),
+	url(r'^get_user_experience/(?P<user_id>[0-9]+)/$',get_user_experience),
+
 ]
  
 urlpatterns += staticfiles_urlpatterns()

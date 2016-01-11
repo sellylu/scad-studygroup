@@ -8,8 +8,9 @@ var admin = 0;
 
 
 function checkShowLoginDiv() {
-	if(user_id != undefined)
+	if(user_id != undefined){
 		adjustCSS();
+	}
 }
 
 function adjustCSS() {
@@ -334,7 +335,9 @@ function add_materials(group_id) {
 	url = '/post_group_materials/' + group_id +'/';
 	$.post( url, {title : title, content: content, creator_id: user_id})
 		.then(function () {
-			window.location = '/group/'+group_id;
+			
+			$('#add_materials_Modal').modal('hide');
+			showMaterials(group_id);
 	});
 }
 
@@ -412,8 +415,8 @@ function postReply(group_id, thought_id) {
 
 	$.post(url, {content: content, thought_id: thought_id, creator_id: user_id})
 		.then(function () {
-			window.location = '/group/' + group_id;
-		});
+			showThoughts(group_id);
+	});
 }
 
 function postThought(group_id) {
@@ -446,8 +449,10 @@ function postThought(group_id) {
 
 	$.post(url, {title: title, content: content, creator_id: user_id})
 		.then(function () {
-			window.location = '/group/' + group_id;
-		});
+			
+			$('#new_thoughts_Modal').modal('hide');
+			showThoughts(group_id);
+	});
 }
 
 // Member Tab
@@ -487,7 +492,8 @@ function setuser_no(){
 		str = '/userno/' + user_id;
 		$.get(str,function(data){
 			  Cookies.set('user_no',data);
-			  });
+		});
+		check_mail_init(user_id);
 	}
 }
 /*
@@ -501,6 +507,8 @@ function checkShowAddButton(member){
 			var tmp = member.split(',');
 			showbutton = 1;
 			for(i=0;i<tmp.length;i++){
+				alert(tmp[i]);
+				alert(user_no);
 				if(user_no == tmp[i]){
 					showbutton = 0;
 				}
@@ -579,3 +587,41 @@ window.fbAsyncInit = function() {
 			version    : 'v2.5'
 			});
 };
+
+
+
+var show_mail_button_interval;
+var start = 0;
+function check_mail_init(user_id){
+    
+
+    self.setInterval('check_mail(user_id)',5000); 
+    //check_mail(user_id);
+  
+}
+function check_mail(user_id){
+    url = '/check_mail/' + user_id + '/'
+    $.get(url,function(data){
+    	if(data == 'y'){
+        	// alert('y');
+        	if(start ==0){
+        		$('#show_mail_button').show();
+            	show_mail_button_interval = setInterval(flicker,3000);
+            	start =1;
+        	}
+        }
+        else{
+        	// alert('n');
+        	start = 0;
+        	$('#show_mail_button').hide();
+            clearInterval(show_mail_button_interval);
+            // alert('clear');
+        } 
+        
+        });
+    
+}
+function flicker(){//閃爍函數
+        $('#show_mail_button').fadeOut(750).fadeIn(750);
+}
+

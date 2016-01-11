@@ -7,25 +7,28 @@
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
 		
 		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"/>
 		<link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons"/>
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"/>
 		{% load static %}
-
-		
-		
-        <link href="{% static 'stylesheets/user.css' %}" rel="stylesheet" type="text/css">
-        <link href="{% static 'stylesheets/simple-sidebar.css' %}" rel="stylesheet" type="text/css">
-        <link href="{% static 'stylesheets/jquery.fancybox.css' %}" rel="stylesheet" type="text/css">
-        <script src="{% static 'javascript/js_cookie.js'  %}"></script>
+		<script src="{% static 'javascript/user.js'  %}"></script>
+		<script src="{% static 'javascript/js_cookie.js'  %}"></script>
         <script src="{% static 'javascript/jquery.fancybox.js'  %}"></script>
 
+        <link href="{% static 'stylesheets/simple-sidebar.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'stylesheets/jquery.fancybox.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'stylesheets/user.css' %}" rel="stylesheet" type="text/css">
+        
         <script type="text/javascript">
-        	var ans;
+        	
             $(document).ready(function() {
-              showGroup();
+            	user_id = Cookies.get('user_id');
+            	check_mail_init(user_id);
+             	showGroup();
+             	show_user_experience();
             
 				$(".missionBox").fancybox({
 					'scrolling'		: 'no',
@@ -38,54 +41,86 @@
 			
 
 			});
-            function creategroup_submit() {
-	            check_group_name = $('#group_name').val();
-	            check_group_intro = $('#intro').val();
-	            check_time = $('#finished_time_date').val();
-	            nosubmit = 0;
-	            if(check_time == '') {
-		            $('#finished_time_date').attr('style','border: 1px solid red');
-		            nosubmit =1;
-	            } else {
-		            $('#finished_time_date').removeAttr('style');
-	            }
-	            if(check_group_intro =='') {
-		            $('#introdiv').attr('class','form-group has-error');
-		            nosubmit =1;
-	            } else {
-		            $('#introdiv').attr('class','form-group');
-	            }
-	            if(check_group_name=='') {
-		            $('#namediv').attr('class','form-group has-error');
-		            nosubmit =1;
-	            } else {
-		            $('#namediv').attr('class','form-group');
-	            }
-	            if(nosubmit==1)return false;
+			function showAchievement() {
+                $('#myContent').empty();
+                {% if user_achievement_data %}
+	                login_achievement_div = $('<div/>', {
+	                    'class': 'achievement_div'
+	                }).html('<h4>Login Achievement</h4>');
+	                post_achievement_div = $('<div/>', {
+	                    'class': 'achievement_div'
+	                }).html('<h4>Post Achievement</h4>');	                
+	                create_achievement_div = $('<div/>', {
+	                    'class': 'achievement_div'
+	                }).html('<h4>Create Group Achievement</h4>');  
 
-	            creator_id = Cookies.get('user_id');
-	            group_name = document.getElementById("group_name").value;
-	            intro = document.getElementById("intro").value;
-	            finished_time = document.getElementById("finished_time_date").value;
+	                login_achieve=[];
+	                login_achieve_pic=[['badge-5_nos_black.png','badge-5_nos.png'],['badge-10_nos_black.png','badge-10_nos.png'],['badge-15_nos_black.png','badge-15_nos.png'],['badge-20_nos_black.png','badge-20_nos.png']];
+	                post_achieve=[];
+	                post_achieve_pic=[['postTime_1_black.png','postTime_1.png'],['postTime_5_black.png','postTime_5.png'],['postTime_10_black.png','postTime_10.png'],['postTime_20_black.png','postTime_20.png']];	                
 
-	            if(document.getElementById("private_op1").checked) {
-		            private = 0;
-	            } else {
-		            private = 1;
-	            }
+	                // user login achievement
+					user_login_cnt = {{user_achievement_data.user_login_cnt}};
+	               	if(user_login_cnt >=0 && user_login_cnt <= 4)
+	               		login_achieve = [0,0,0,0];
+	               	else if(user_login_cnt >=5 && user_login_cnt <= 9)
+	               		login_achieve = [1,0,0,0];
+	               	else if(user_login_cnt >=10 && user_login_cnt <= 14)
+	               		login_achieve = [1,1,0,0];
+	               	else if(user_login_cnt >=15 && user_login_cnt <= 19)
+	               		login_achieve = [1,1,1,0];	               		
+	               	else if(user_login_cnt >=20)
+	               		login_achieve = [1,1,1,1];
+	               	
+	               	for(i = 0; i < 4; i++) {
+		                $('<img/>', {
+		                    'class': 'achievement',
+		                    src: '{% static "images/' + login_achieve_pic[i][login_achieve[i]] + '" %}',
+		                    width: 150
+		                }).appendTo(login_achievement_div);
+	               	}
 
-	            date = Date.now();
-	            group_id = creator_id + date;
-	            member_limit = parseInt(document.getElementsByName("member_limit")[0].value);
-	            $.post( "/", { group_id : group_id, group_name : group_name,  member_limit :member_limit,intro:intro,private:private,creator_id:creator_id ,finished_time:finished_time})
-			            .then(function () {
-				            window.location = '/group/'+group_id;
-			            });
+	                // user post achievement
+					user_post_cnt = {{user_achievement_data.user_post_int}};
+	               	if(user_post_cnt ==0)
+	               		post_achieve = [0,0,0,0];
+	               	else if(user_post_cnt >=1 && user_post_cnt <= 4)
+	               		post_achieve = [1,0,0,0];
+	               	else if(user_post_cnt >=5 && user_post_cnt <= 9)
+	               		post_achieve = [1,1,0,0];
+	               	else if(user_post_cnt >=10 && user_post_cnt <= 19)
+	               		post_achieve = [1,1,1,0];	               		
+	               	else if(user_post_cnt >=20)
+	               		post_achieve = [1,1,1,1];
+	               	
+	               	for(i = 0; i < 4; i++) {
+		                $('<img/>', {
+		                    'class': 'achievement',
+		                    src: '{% static "images/' + post_achieve_pic[i][post_achieve[i]] + '" %}',
+		                    width: 150
+		                }).appendTo(post_achievement_div);
+	               	}
+	                
+	                {% if user_achievement_data.user_created_achieve == 0%}
+		                $('<img/>', {
+		                    'class': 'achievement',
+		                    src: '{% static "images/trophy_black.png" %}',
+		                    width: 150
+		                }).appendTo(create_achievement_div);	                	
+	                {% else %}
+		                $('<img/>', {
+		                    'class': 'achievement',
+		                    src: '{% static "images/trophy.png" %}',
+		                    width: 150
+		                }).appendTo(create_achievement_div);	                
+	                {% endif %}
+	                
+	                $('#myContent').append(login_achievement_div);
+	                $('#myContent').append(post_achievement_div);
+	                $('#myContent').append(create_achievement_div);
+	            {% endif %}
             }
-            function logout() {
-	            Cookies.remove('user_id');
-	            window.location = '/';
-            }
+
             function showGroup() {
                 $('#myContent').empty();
                 {% if user_page_data %}
@@ -111,133 +146,6 @@
 	                $('#myContent').append('<div class="list-group">' + groups + '</div>');
                 {% endif %}
             }
-
-            function showMission() {
-	            $('#myContent').empty();
-
-	            user_id = Cookies.get('user_id');
-	            str = '/get_mission/' + user_id + '/';
-				$.get(str, function(data){
-
-					mission_list = data.split(',');
-					var mission ='';
-					for(var i = 0; i < mission_list.length; i++) {
-						mission_no = mission_list[i];
-						mission = '<a class="missionBox" href="#name_checking_div" onclick="renderMission(' + mission_no + ')"><div class="list-group-item row"><h4 align="center">Mission from System</h4></div></a>';
-						
-					}
-
-					$('#myContent').append(mission);
-					console.log(data);
-				});
-            }
-
-			function renderMission(mission_no) {
-				$("#name_checking_div").empty();
-					
-				str = '/check_Name/' + mission_no.toString()+ '/';
-				
-				$.get(str, function(data){
-
-					tmp = data.split(';');
-					user_id = tmp[0];
-
-					user_pic = 'http://graph.facebook.com/' + user_id + '/picture?type=large';
-		            img = $('<img/>', {
-		                'class': 'achievement',
-		                src: user_pic,
-		                width: 200
-		            });
-					
-					name_list = tmp[1].split(',');
-					name = '';
-		            for(i = 0; i < name_list.length-1; i++) {
-		            	name += '<button type="button" onclick="checkAns(\'' + name_list[i] + '\')">' + name_list[i] + '</button>';
-		            }
-		            
-					ans = tmp[2];
-
-
-		        }).then(function () {
-		            div = $('<div/>', {
-		                'class': 'nameChecking'
-		            }).css({
-		            	'text-align': 'center'
-		            }).html('<p id="question">Who is this?</p><p>' + name +'</p>').prepend(img);
-
-		            $('#name_checking_div').append(div);
-		        });
-			}
-
-			function checkAns (input) {
-				if(input == ans) {
-					alert('you got it right');	
-				}
-				else {
-					alert('wrong answerQQ')
-				}
-			}
-
-            function showAchievement() {
-                $('#myContent').empty();
-
-                var div = $('<div/>', {
-                    'class': 'login_achievement'
-                }).html('<h4>Login Achievement</h4>');
-
-                var img = $('<img/>', {
-                    'class': 'achievement',
-                    src: '{% static "images/logo.jpg" %}',
-                    width: 150
-                }).appendTo(div);
-
-                var img = $('<img/>', {
-                    'class': 'achievement',
-                    src: '{% static "images/logo.jpg" %}',
-                    width: 150
-                }).appendTo(div);
-
-                var img = $('<img/>', {
-                    'class': 'achievement',
-                    src: '{% static "images/logo.jpg" %}',
-                    width: 150
-                }).appendTo(div);
-
-                var img = $('<img/>', {
-                    'class': 'achievement',
-                    src: '{% static "images/logo.jpg" %}',
-                    width: 150
-                }).appendTo(div);
-
-                $('#myContent').append(div);
-            }
-            function showMailbox() {
-	            $('#myContent').empty();
-
-	            user_id = Cookies.get('user_id');
-	            str = '/get_mail/' + user_id + '/';
-
-				$.get(str, function(data){
-					var tmp = data.split(";");
-					var news = '';
-					for(var i = 0; i < tmp.length-1; i++) {
-						tmp2 = tmp[i].split(',');
-						mail_title = tmp2[0];
-						mail_content = tmp2[1];
-						mail_created_time = tmp2[2];
-						news += '<tr onclick="displayContent(' + i + ')"><td>' + mail_created_time + '</td><td>' + mail_title + '</td></tr>' + '<tr class="news_content" id=' + i + '><td colspan="2">' + mail_content + '</td></tr>';
-					}
-					$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>CONTENT</td></tr></thead><tbody>' + news + '</tbody></table>');
-					console.log(data);
-				});
-            }
-	        function displayContent(id) {
-		        if(document.getElementById(id).style.display == "none")
-			        $('#'+id).show();
-		        else
-			        document.getElementById(id).style.display = "none";
-	        }
-
         </script>
     </head>
     <body>
@@ -255,6 +163,7 @@
 						<li role="presentation"><a href="#" onclick="logout();">Log Out</a></li>
 					</ul>
 					<button type="button" class="btn btn-primary navbar-btn navbar-right" id="create_group_button" data-toggle="modal" data-target="#create_group_Modal">Create Group</button>
+					<button type="button" width='100px' class="btn btn-primary navbar-btn navbar-left" id="show_mail_button" style="display:none;">You have a new mail.</button>
 
 				</div>
             </div>
@@ -262,14 +171,8 @@
 
         <header>
 	        <div class="exp">
-                <b>LV.20</b>
-                <div id="user_exp">
-	                <div class="progress">
-		                <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width:70%">
-                            <span class="sr-only">70% Complete</span>
-                        </div>
-                    </div>
-                </div>
+                
+                 
             </div>
         </header>
         <br class="space">

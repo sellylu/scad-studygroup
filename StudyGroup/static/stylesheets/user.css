@@ -18,7 +18,9 @@
   background-color: #011C28;
   height: 21px;
 }
-
+.news_content {
+  display: none;
+}
 /* line 46, ../sass/styles.scss */
 .modal-footer {
   word-wrap: break-word;
@@ -144,4 +146,8 @@ header {
 .group_img {
 	padding: 5px;
 	border-radius: 20px;
+}
+
+.mail_unread {
+  background-color: #fff;
 }

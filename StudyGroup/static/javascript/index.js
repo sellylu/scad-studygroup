@@ -4,8 +4,9 @@ $.ajaxSetup({
 
 function checkShowLoginDiv() {
     user_id = Cookies.get('user_id');
-	if(user_id != undefined)
+	if(user_id != undefined) {
 		adjustCSS();
+    }
 }
 
 function creategroup_submit() {
@@ -71,8 +72,8 @@ function saveUserInfo() {
                    .then(function(){
 						 adjustCSS();
 						 Cookies.set('user_id',response.id);
-						 console.log('Successful login for: ' + response.name + ' with ' + response.id + ' and ' + response.email + 'and ' + response.picture.data.url);
-                   });
+                         appendMyGroup();
+						 });
             }
 		});
 }
@@ -84,6 +85,46 @@ function adjustCSS() {
 	$('#create_group_button').show();
 	$('#NavBar').css('background-color', 'black');
 	$('a.navbar-brand').css('color', '#dddddd');
+}
+
+function appendMyGroup() {
+            user_id = Cookies.get('user_id');
+            if(user_id != undefined) {
+                $('#joined-group').empty();
+                user_id = Cookies.get('user_id');
+                str = '/get_my_group/' + user_id + '/';
+
+                $.get(str, function(data){
+                    var tmp = data.split(";");
+                    var groups = '';
+                    for(var i = 0; i < tmp.length-1; i++) {
+                        tmp2 = tmp[i].split(',');
+                        group_id = tmp2[0];
+                        group_name = tmp2[1];
+                        group_intro = tmp2[2];
+                        group_created_time = tmp2[3];
+                        group_finished_time = tmp2[4];
+                        member_limit = tmp2[5];
+                        member_num = tmp2[6];
+                        creator = tmp2[7];
+
+                        if(member_limit == 0) {
+                            groups += '<div class="col-md-4"><div class="panel panel-warning"><div class="panel-heading"><a href="/group/' + group_id + '/"><div><h4 align="center">' + group_name + '</h4></div></a></div><div class="panel-body"><p align="center">' + group_intro + '</p><hr><p><b>Period:</b>' + group_created_time + '~' + group_finished_time + '<br><b>Number of Members and Limitation:</b> ' + member_num + ' / ∞<br><b>Creator:</b>' + creator + '</p></div></div></div>';
+                        }
+                        else {
+                            groups += '<div class="col-md-4"><div class="panel panel-warning"><div class="panel-heading"><a href="/group/' + group_id + '/"><div><h4 align="center">' + group_name + '</h4></div></a></div><div class="panel-body"><p align="center">' + group_intro + '</p><hr><p><b>Period:</b>' + group_created_time + '~' + group_finished_time + '<br><b>Number of Members and Limitation:</b> ' + member_num + ' / ' + member_limit + '<br><b>Creator:</b>' + creator + '</p></div></div></div>';
+                        }
+                    }
+
+            
+                    $('#joined-group').append('<div class="col-md-12"><h2>My Groups</h2><br class="space"></div><hr style="height:2px; background-color:#d4d4d4;">');
+                    $('#joined-group').append(groups);
+                    console.log(data);
+                });  
+
+                
+                check_mail_init(user_id);
+            }           
 }
 
 (function(d, s, id){
@@ -131,3 +172,41 @@ window.fbAsyncInit = function() {
             version    : 'v2.5'
             });
 };
+
+
+var show_mail_button_interval;
+var start = 0;
+function check_mail_init(user_id){
+    
+
+    self.setInterval('check_mail(user_id)',5000); 
+    //check_mail(user_id);
+  
+}
+function check_mail(user_id){
+    url = '/check_mail/' + user_id + '/'
+    $.get(url,function(data){
+        if(data == 'y'){
+            // alert('y');
+            if(start ==0){
+                $('#show_mail_button').show();
+                show_mail_button_interval = setInterval(flicker,3000);
+                start =1;
+            }
+        }
+        else{
+            // alert('n');
+            start = 0;
+            $('#show_mail_button').hide();
+            clearInterval(show_mail_button_interval);
+            // alert('clear');
+        } 
+        
+        });
+    
+}
+function flicker(){//閃爍函數
+        $('#show_mail_button').fadeOut(750).fadeIn(750);
+}
+
+    

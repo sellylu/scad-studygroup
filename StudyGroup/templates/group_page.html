@@ -77,7 +77,8 @@
 						<li role="presentation"><a href="#" onclick="showThoughts('{{ group_page_data.group_id }}')">Thoughts</a></li>
 						<li role="presentation"><a href="#" onclick="Group_Member_inf('{{ group_page_data.group_id }}');">Members</a></li>
 					</ul>
-
+					<button type="button" width='100px' class="btn btn-primary navbar-btn navbar-left" id="show_mail_button" style="display:none;">You have a new mail.</button>
+					
 					<script>    // change active tab
 						$(".nav a").on("click", function(){
 							if(this.innerHTML != 'Members') {
@@ -148,14 +149,7 @@
                     <div class="container-fluid" id="myContent">
 
  <!--script>
-$(function(){
-	var i = 14;
-    setInterval(flicker,1500);//迴圈閃爍，間隔1秒
-})
-function flicker(){//閃爍函數
-    $('.shine').fadeOut(750).fadeIn(750);
-	$('.shine').css('font-size', $('.shine').css('font-size')+1);
-}
+
 
 </script-->
 
