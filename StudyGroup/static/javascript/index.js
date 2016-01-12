@@ -195,12 +195,10 @@ function check_mail(user_id){
             }
         }
         else{
-            // alert('n');
             start = 0;
             $('#show_mail_button').hide();
             clearInterval(show_mail_button_interval);
-            // alert('clear');
-        } 
+            } 
         
         });
     
