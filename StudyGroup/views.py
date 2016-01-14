@@ -586,6 +586,7 @@ def get_group_thoughts(request, group_id):
 			data2 = cursor.fetchall()
 
 			if data2:
+				print("haha")
 				for i, reply in enumerate(data2):
 					get_user_sql = "SELECT name,pic FROM  user WHERE user_id = '%s'" % reply[4]
 					cursor.execute(get_user_sql)
@@ -596,6 +597,7 @@ def get_group_thoughts(request, group_id):
 						thought_str += ',' + reply[2] + ',' + reply[3] + ',0,0'
 				thought_str += ';'
 			else:
+				print("qqqqqqqqqq")
 				thought_str += ';'
 		
 		return HttpResponse(thought_str)

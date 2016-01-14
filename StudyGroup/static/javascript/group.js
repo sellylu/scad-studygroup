@@ -41,25 +41,25 @@ function logout() {
 
 function send_mail_submit(group_id) {
 	check_title = $('#title').val();
-	check_content = nic.findEditor("content").getContent();;
+	check_content = $("#content").val();
 
 	nosubmit = 0;
 	if(check_content =='') {
-		$('#contentdiv').attr('class','form-group has-error');
+		$('#mailcontentdiv').attr('class','form-group has-error');
 		nosubmit =1;
 	} else {
-		$('#contentdiv').attr('class','form-group');
+		$('#mailcontentdiv').attr('class','form-group');
 	}
 	if(check_title=='') {
-		$('#titlediv').attr('class','form-group has-error');
+		$('#mailtitlediv').attr('class','form-group has-error');
 		nosubmit =1;
 	} else {
-		$('#titlediv').attr('class','form-group');
+		$('#mailtitlediv').attr('class','form-group');
 	}
 	if(nosubmit==1)return false;
 
 	title = document.getElementById("title").value;
-	content = nic.findEditor("content").getContent();
+	content = $("#content").val();
 
 	str = '/send_mail/' + group_id + '/';
 	$.post( str, { title : title,  content : content, creator_id: user_id})
@@ -93,7 +93,10 @@ function showprogress(created_time,finish_time){
 }
 
 // Create Group
+
 function creategroup_submit() {
+
+	date = Date.now();
     check_group_name = $('#group_name').val();
     check_group_intro = $('#intro').val();
 	check_time = $('#datepicker').val();
@@ -104,6 +107,14 @@ function creategroup_submit() {
 	} else {
 		$('#datepicker').removeAttr('style');
 	}
+	var check = new Date(check_time);
+	if(check.valueOf() - date < 0){
+		$('#datepicker').attr('style','border: 1px solid red');
+		nosubmit =1;
+	} else {
+		$('#datepicker').removeAttr('style');
+	}
+
 	if(check_group_intro =='') {
 		$('#introdiv').attr('class','form-group has-error');
 		nosubmit =1;
@@ -111,10 +122,10 @@ function creategroup_submit() {
 		$('#introdiv').attr('class','form-group');
 	}
 	if(check_group_name=='') {
-		$('#namediv').attr('class','form-group has-error');
+		$('#creatednamediv').attr('class','form-group has-error');
 		nosubmit =1;
     } else {
-		$('#namediv').attr('class','form-group');
+		$('#creatednamediv').attr('class','form-group');
 	}
 	if(nosubmit==1)return false;
 
@@ -126,7 +137,6 @@ function creategroup_submit() {
 	} else {
 		private = 1;
 	}
-	date = Date.now();
 	var group_id = user_id + date;
 	member_limit = parseInt(document.getElementsByName("member_limit")[0].value);
 	
@@ -139,8 +149,9 @@ function creategroup_submit() {
 
 // News Tab
 function showNews(group_id) {
+
+	
 	$('#myContent').empty();
-	$('#news_content').val('');
 	$('#myContent').append('<button type="button" class="btn btn-primary admin-btn" id="add_news_button" data-toggle="modal" data-target="#add_news_Modal">Add News</button>');
 	var str = '/get_group_news/' + group_id;
 	
@@ -168,16 +179,16 @@ function add_group_news(group_id) {
 	nosubmit = 0;
 	
 	if(check_news_content =='') {
-		$('#contentdiv').attr('class','form-group has-error');
+		$('#newscontentdiv').attr('class','form-group has-error');
 		nosubmit =1;
 	} else {
-		$('#contentdiv').attr('class','form-group');
+		$('#newscontentdiv').attr('class','form-group');
 	}
 	if(check_news_title=='') {
-		$('#namediv').attr('class','form-group has-error');
+		$('#newsnamediv').attr('class','form-group has-error');
 		nosubmit =1;
 	} else {
-		$('#namediv').attr('class','form-group');
+		$('#newsnamediv').attr('class','form-group');
 	}
 	if(nosubmit==1)return false;
 	
@@ -228,6 +239,12 @@ function showSchedule(group_id) {
 								},
 								
 								eventClick: function(calEvent, jsEvent, view) {
+
+
+
+								
+
+								if(member){
 								var c = confirm('Delete it?');
 								if(c==true){
 								
@@ -244,41 +261,70 @@ function showSchedule(group_id) {
 								
 								url = '/deletecalendarevent/' + group_id +'/';
 		     	$.post(url, { title:title,start: datetime}).then(function(){
-																 showSchedule(group_id);
-																 });
+								showSchedule(group_id);
+				});
 								
 								
-								
+								}
 								}
 								},
 								
 								dayClick: function(date, allDay, jsEvent, view) {
+									
+								
 									if (member) {
-										var title = prompt('Add new event');
-										if (title) {
-											var d = new Date(date);
-											var year = d.getFullYear();
-											var month = (d.getMonth() + 1);
-											var date = d.getDate();
-											if (month < 10) month = '0' + month;
-											if (date < 10)date = '0' + date;
-											var datetime = year + '-' + month + '-' + date;
-
-											url = '/postcalendarevent/' + group_id + '/';
-											$.post(url, {title: title, start: datetime}).
-											then(function () {
-												showSchedule(group_id);
-											});
-										}
+										var d = new Date(date);
+										Cookies.set('dayClickTime', d);
+										$("#schedule_addevent_Modal").modal();
+						
 									}
 								}
+				
 	});
 	
 }
 
+
+
+
+function add_schedule_event(group_id) {
+	check_schedule_content = $("#schedule_content").val();
+
+	nosubmit = 0;
+
+	if(check_schedule_content =='') {
+		$('#schedulecontentdiv').attr('class','form-group has-error');
+		nosubmit =1;
+	} else {
+		$('#schedulecontentdiv').attr('class','form-group');
+	}
+	if(nosubmit==1)return false;
+
+	content = $("#schedule_content").val();
+	var d = new Date(Cookies.get('dayClickTime'));
+	var year = d.getFullYear();
+	var month = (d.getMonth() + 1);
+	var date = d.getDate();
+	if (month < 10) month = '0' + month;
+	if (date < 10)date = '0' + date;
+	var datetime = year + '-' + month + '-' + date;
+	
+	var url = '/postcalendarevent/' + group_id + '/';
+	$.post(url, {title: content, start: datetime}).
+		then(function () {
+
+		$('#schedule_addevent_Modal').modal('hide');
+		showSchedule(group_id);
+	});
+}
+
+
+
+
 // Material Tab
 function showMaterials(group_id) {
 	$('#myContent').empty();
+	var n = new nicEditor({fullPanel: true}).panelInstance('materials_content');
 
 	var newMaterial_str = '<button class="btn btn-success member-btn" id="add_materials_button" data-toggle="modal" data-target="#add_materials_Modal" style="width: auto"><i class="glyphicon glyphicon-plus"/>Add Material</button><br class="space">';
 	var output = newMaterial_str + '<div class="panel-group">';
@@ -316,16 +362,16 @@ function add_materials(group_id) {
 	nosubmit = 0;
 
 	if(check_materials_content =='') {
-		$('#contentdiv').attr('class','form-group has-error');
+		$('#materialscontentdiv').attr('class','form-group has-error');
 		nosubmit =1;
 	} else {
-		$('#contentdiv').attr('class','form-group');
+		$('#materialscontentdiv').attr('class','form-group');
 	}
 	if(check_materials_title=='') {
-		$('#namediv').attr('class','form-group has-error');
+		$('#materialsnamediv').attr('class','form-group has-error');
 		nosubmit =1;
 	} else {
-		$('#namediv').attr('class','form-group');
+		$('#materialsnamediv').attr('class','form-group');
 	}
 	if(nosubmit==1)return false;
 
@@ -342,17 +388,21 @@ function add_materials(group_id) {
 }
 
 // Thought Tab
-function showThoughts(group_id) {
+function showThoughts(group_id,replied) {
 	$('#myContent').empty();
+	var n = new nicEditor({fullPanel: true}).panelInstance('thought_content');
+	$('#thought_content').val('');
 
 	var newThought_str = '<button class="btn btn-success member-btn" data-toggle="modal" data-target="#new_thoughts_Modal" style="width: auto"><i class="glyphicon glyphicon-plus"/>New Thought</button><br class="space">';
 
 	var output = newThought_str + '<div class="panel-group">';
 
 	$.get('/get_group_thoughts/' + group_id + '/', function(data) {
+		alert(data);
 		data = data.split(";");
-		var tmp_str = '<ul class="list-group">';
 		for (var i = 0; i < data.length - 1; i++) {
+			var tmp_str = '<ul class="list-group">';
+		
 			tmp = data[i].split(',');
 			var thought = {
 				'no': tmp[0],
@@ -362,9 +412,16 @@ function showThoughts(group_id) {
 				'creator': tmp[4]
 			};
 			reply_num = (tmp.length - 5)/4;
-			output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + thought.no + '" data-toggle="collapse">'
+			if(replied == thought.no){
+				output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + thought.no + '" data-toggle="collapse">'
+				+ thought.title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + thought.date + ' by ' + thought.creator + '</div><div class="col-md-4" align="right">Replied by ' + reply_num + ' people.</div></div></div>'
+				+ '<div class="panel-collapse collapse in" id="t' + thought.no + '">';
+			}else{
+				output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + thought.no + '" data-toggle="collapse">'
 				+ thought.title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + thought.date + ' by ' + thought.creator + '</div><div class="col-md-4" align="right">Replied by ' + reply_num + ' people.</div></div></div>'
 				+ '<div class="panel-collapse collapse" id="t' + thought.no + '">';
+			
+			}
 			output += '<div class="panel-body">' + thought.content + '</div>';
 			for (var j = 5; j < tmp.length; j += 4) {
 				var obj = {
@@ -373,6 +430,7 @@ function showThoughts(group_id) {
 					'creator': tmp[j + 2],
 					'creator_pic': tmp[j + 3]
 				};
+				
 				tmp_str += '<li class="list-group-item"><div class="row"><div class="col-md-1"><img src="' + obj.creator_pic + '" class="img-thumbnail"></div>'
 					+ '<div class="col-md-11"><div class="reply-info">' + obj.creator + ' / ' + obj.date + '</div>'
 					+ '<div class="reply-content">' + obj.content + '</div></div></div></li>';
@@ -400,10 +458,10 @@ function postReply(group_id, thought_id) {
 	nosubmit = 0;
 
 	if(check_thought_content =='') {
-		$('#contentdiv').attr('class','form-group has-error');
+		$(tID).attr('class','form-group has-error');
 		nosubmit =1;
 	} else {
-		$('#contentdiv').attr('class','form-group');
+		$(tID).attr('class','form-group');
 	}
 	if(nosubmit==1)return false;
 
@@ -415,7 +473,7 @@ function postReply(group_id, thought_id) {
 
 	$.post(url, {content: content, thought_id: thought_id, creator_id: user_id})
 		.then(function () {
-			showThoughts(group_id);
+			showThoughts(group_id,thought_id);
 	});
 }
 
@@ -428,16 +486,17 @@ function postThought(group_id) {
 	nosubmit = 0;
 
 	if(check_thought_content =='') {
-		$('#contentdiv').attr('class','form-group has-error');
+		$('#thoughtcontentdiv').attr('class','form-group has-error');
 		nosubmit =1;
 	} else {
-		$('#contentdiv').attr('class','form-group');
+		$('#thoughtcontentdiv').attr('class','form-group');
 	}
+
 	if(check_thought_title=='') {
-		$('#namediv').attr('class','form-group has-error');
+		$('#thoughtnamediv').attr('class','form-group has-error');
 		nosubmit =1;
 	} else {
-		$('#namediv').attr('class','form-group');
+		$('#thoughtnamediv').attr('class','form-group');
 	}
 	if(nosubmit==1)return false;
 
@@ -451,7 +510,7 @@ function postThought(group_id) {
 		.then(function () {
 			
 			$('#new_thoughts_Modal').modal('hide');
-			showThoughts(group_id);
+			showThoughts(group_id,-1);
 	});
 }
 
@@ -496,37 +555,7 @@ function setuser_no(){
 		check_mail_init(user_id);
 	}
 }
-/*
-function checkShowAddButton(member){
-	id = Cookies.get('user_id');
-	if(id != undefined){
-		
-		user_no = Cookies.get('user_no');
-		showbutton = 0;
-		if(user_no != undefined){
-			var tmp = member.split(',');
-			showbutton = 1;
-			for(i=0;i<tmp.length;i++){
-				alert(tmp[i]);
-				alert(user_no);
-				if(user_no == tmp[i]){
-					showbutton = 0;
-				}
-			}
-		}
-		if(showbutton == 1){
-			$('#join_group_btn').show();
-			$('.member-btn').hide();
-		}else{
-			$('#join_group_btn').hide();
-			$('.member-btn').show();
-		}
-	} else {
-		$('#join_group_btn').show();
-		$('.member-btn').hide();
-	}
-}
-*/
+
 function saveUserInfo() {
 	FB.api('/me',{"fields": "name, email"}, function(response) {
 		   if(response && !response.error) {

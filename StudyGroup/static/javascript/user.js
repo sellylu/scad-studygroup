@@ -4,9 +4,11 @@ $.ajaxSetup({
 var ans;
 
 		function creategroup_submit() {
+
+	            date = Date.now();
     			check_group_name = $('#group_name').val();
 			    check_group_intro = $('#intro').val();
-	            check_time = $('#datapicker').val();
+	            check_time = $('#datepicker').val();
 	            nosubmit = 0;
 	            if(check_time == '') {
 		            $('#datapicker').attr('style','border: 1px solid red');
@@ -14,6 +16,15 @@ var ans;
 	            } else {
 		            $('#datapicker').removeAttr('style');
 	            }
+
+	            var check = new Date(check_time);
+				if(check.valueOf() - date < 0){
+					$('#datepicker').attr('style','border: 1px solid red');
+					nosubmit =1;
+				} else {
+					$('#datepicker').removeAttr('style');
+				}
+
 	            if(check_group_intro =='') {
 		            $('#introdiv').attr('class','form-group has-error');
 		            nosubmit =1;
@@ -21,17 +32,17 @@ var ans;
 		            $('#introdiv').attr('class','form-group');
 	            }
 	            if(check_group_name=='') {
-		            $('#namediv').attr('class','form-group has-error');
+		            $('#creatednamediv').attr('class','form-group has-error');
 		            nosubmit =1;
 	            } else {
-		            $('#namediv').attr('class','form-group');
+		            $('#creatednamediv').attr('class','form-group');
 	            }
 	            if(nosubmit==1)return false;
 
 	            creator_id = Cookies.get('user_id');
 	            group_name = document.getElementById("group_name").value;
 	            intro = document.getElementById("intro").value;
-	            finished_time = document.getElementById("datapicker").value;
+	            finished_time = document.getElementById("datepicker").value;
 
 	            if(document.getElementById("private_op1").checked) {
 		            private = 0;
@@ -39,7 +50,6 @@ var ans;
 		            private = 1;
 	            }
 
-	            date = Date.now();
 	            group_id = creator_id + date;
 	            member_limit = parseInt(document.getElementsByName("member_limit")[0].value);
 	            $.post( "/", { group_id : group_id, group_name : group_name,  member_limit :member_limit,intro:intro,private:private,creator_id:creator_id ,finished_time:finished_time})
@@ -53,7 +63,9 @@ var ans;
             }
             function gotoinf(){
             	userid = Cookies.get("user_id");
+            	Cookies.set("mail",1);
             	window.location = '/user/' + user_id;
+
             }
             
 

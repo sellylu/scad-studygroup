@@ -27,7 +27,7 @@
 
 	    <script type="text/javascript">
 		    var nic = nicEditors;
-		    bkLib.onDomLoaded(function() { nic.allTextAreas(); });
+		    //bkLib.onDomLoaded(function() { nic.allTextAreas(); });
 
 		    $(document).ready(function() {
 			    $('#datepicker').datepicker({dateFormat:'yy-mm-dd', changeMonth:true, changeYear:true});
@@ -60,6 +60,7 @@
 			});
 			function gotoinf(){
             	userid = Cookies.get("user_id");
+            	Cookies.set("mail",1);
             	window.location = '/user/' + user_id;
 }
 	    </script>
@@ -78,7 +79,7 @@
 						<li role="presentation" class="active"><a href="#" onclick="showNews('{{group_page_data.group_id}}')">News</a></li>
 						<li role="presentation"><a href="#" onclick="showSchedule('{{group_page_data.group_id}}')">Schedule</a></li>
 						<li role="presentation"><a href="#" onclick="showMaterials('{{group_page_data.group_id}}')">Materials</a></li>
-						<li role="presentation"><a href="#" onclick="showThoughts('{{ group_page_data.group_id }}')">Thoughts</a></li>
+						<li role="presentation"><a href="#" onclick="showThoughts('{{ group_page_data.group_id }}',-1)">Thoughts</a></li>
 						<li role="presentation"><a href="#" onclick="Group_Member_inf('{{ group_page_data.group_id }}');">Members</a></li>
 					</ul>
 					<button type="button" width='100px' class="btn btn-primary navbar-btn navbar-left" id="show_mail_button" style="display:none;" onclick="gotoinf()">You have a new mail.</button>
@@ -97,12 +98,7 @@
 						<li><a href="#" onclick="logout();">Log Out</a></li>
 					</ul>
 					<button type="button" class="btn btn-primary navbar-btn navbar-right" id="create_group_button" data-toggle="modal" data-target="#create_group_Modal" style="display: none;">Create Group</button>
-					<script>
-						$('#create_group_button').on('click', function() {
-							nic.findEditor("intro").remove();
-							$('#intro').val('');
-						});
-					</script>
+					
 				</div>
             </div>
         </nav>
@@ -144,8 +140,10 @@
 				        <div class="progress">
 		                    <div id="progress-bar" class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
+
 		                <button id="join_group_btn" class="btn btn-lg btn-success" onclick="joinGroup('{{ group_page_data.group_id }}');" >JOIN</button>
-			            <button type="button" class="btn btn-primary member-btn" id="send_mail_button" data-toggle="modal" data-target="#send_mail_Modal">Send Mail</button>
+
+			            <button type="button" class="btn btn-primary member-btn" id="send_mail_button" data-toggle="modal" data-target="#send_mail_Modal">Broadcast</button>
 			        </div>
 		        </div>
 	            <div id="page-content-wrapper">
@@ -169,25 +167,27 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<div id="titlediv">
+						<div id="mailtitlediv">
 							<h4 class="modal-title">Title</h4>
 							<input type="text" class="form-control" name="title" id="title" placeholder="Title">
 						</div>
 					</div>
 					<div class="modal-body">
-						<div id="contentdiv">
+						<div id="mailcontentdiv">
 							<label>Content</label>
-							<textarea class="form-control editor" name="content" id="content" rows="3"></textarea>
+							<textarea class="form-control" name="content" id="content" rows="3"></textarea>
 							<hr>
 						</div>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary" onclick="send_mail_submit('{{ group_page_data.group_id }}')">Create</button>
+						<button type="button" class="btn btn-primary" onclick="send_mail_submit('{{ group_page_data.group_id }}')">Send</button>
 					</div>
 				</div>
 			</div>
 		</div>
+
+
         <!-- Add News Modal -->
 		<div id="add_news_Modal" class="modal fade" role="dialog">
 			<div class="modal-dialog">
@@ -195,27 +195,52 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<div id="namediv">
+						<div id="newsnamediv">
 							<h4 class="modal-title">Title</h4>
 							<input type="text" class="form-control" name="news_title" id="news_title" placeholder="Title">
 						</div>
 					</div>
 					<div class="modal-body">
-						<div id="contentdiv">
+						<div id="newscontentdiv">
 							<label>Content</label>
-							<textarea class="form-control editor" name="news_content" id="news_content" rows="3"></textarea>
+							<textarea class="form-control" name="news_content" id="news_content" rows="3"></textarea>
 							<hr>
-							<script>
-								$('#add_news_Modal').on('click', function() {
-									nic.findEditor("news_content").remove();
-								});
-
-							</script>
+							
 						</div>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 						<button type="button" class="btn btn-primary" onclick="add_group_news('{{group_page_data.group_id}}')">Post</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+		<!-- schedule event -->
+ 		<div id="schedule_addevent_Modal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<div id="namediv">
+							<h4 class="modal-title">Add a Event</h4>
+						</div>
+					</div>
+					<div class="modal-body">
+						<div id="schedulecontentdiv">
+							<label>Content</label><br>
+							<textarea class="form-control" name="schedule_content" id="schedule_content" rows="3"></textarea>
+							<hr>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="add_schedule_event('{{group_page_data.group_id}}')">Post</button>
+					
+
 					</div>
 				</div>
 			</div>
@@ -228,13 +253,13 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<div id="namediv">
+						<div id="materialsnamediv">
 							<h4 class="modal-title">Title</h4>
 							<input type="text" class="form-control" name="materials_title" id="materials_title" placeholder="Title">
 						</div>
 					</div>
 					<div class="modal-body">
-						<div id="contentdiv">
+						<div id="materialscontentdiv">
 							<label>Content</label>
 							<textarea class="form-control editor" name="materials_content" id="materials_content" rows="3"></textarea>
 							<hr>
@@ -255,13 +280,13 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<div id="namediv">
+						<div id="thoughtnamediv" class="form-group">
 							<h4 class="modal-title">Title</h4>
 							<input type="text" class="form-control" name="thought_title" id="thought_title" placeholder="Title">
 						</div>
 					</div>
 					<div class="modal-body">
-						<div id="contentdiv">
+						<div id="thoughtcontentdiv" >
 							<label>Content</label>
 							<textarea class="form-control editor" name="thought_content" id="thought_content" rows="3"></textarea>
 							<hr>
@@ -282,7 +307,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<div id="namediv">
+						<div id="creatednamediv">
 							<h4 class="modal-title">Group Name</h4>
 							<input type="text" class="form-control" name="group_name" id="group_name" placeholder="要將讀書會取作什麼呢？">
 								</div>
@@ -315,13 +340,13 @@
 						<hr>
 						<div id="member_limitdiv">
 							<fieldset>
-								<label for="sel1">人數上限 (0為無限制)</label>
+								<label for="sel1">人數上限</label>
 								<select name="member_limit" class="form-control" id="sel1">
-									<option>0</option>
-									<option>5</option>
-									<option>10</option>
-									<option>15</option>
-									<option>20</option>
+									<option value="0">無限制</option>
+									<option value="5">5</option>
+									<option value="10">10</option>
+									<option value="15">15</option>
+									<option value="20">20</option>
 								</select>
 							</fieldset>
 						</div>
