@@ -27,6 +27,11 @@
 	            
             });
 
+            function gotoinf(){
+            	userid = Cookies.get("user_id");
+            	window.location = '/user/' + user_id;
+            }
+
 
 		</script>
     </head>
@@ -48,7 +53,8 @@
 						<li><a href="#" onclick="getMyInfoURL()">My Information</a></li>
 						<li><a href="#" onclick="logout()">Log Out</a></li>
 					</ul>
-					<button type="button" width='100px' class="btn btn-primary navbar-btn navbar-left" id="show_mail_button" style="display:none;">You have a new mail.</button>
+					<button type="button" width='100px' class="btn btn-primary navbar-btn navbar-left" id="show_mail_button" style="display:none;" onclick="gotoinf()">You have a new mail.</button>
+
 					<button type="button" class="btn btn-primary navbar-btn navbar-right" id="create_group_button" data-toggle="modal" data-target="#create_group_Modal" style="display: none;">Create Group</button>
 
 				</div>

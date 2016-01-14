@@ -56,19 +56,19 @@ def index(request):
 				print('ff')
 
 				if 15<=exp+10 <= 49:
-					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =1,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 			
 				elif 50<=exp+10 <= 89:
-					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =2,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =2, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 			
 				elif 90<=exp+10 <= 139:
-					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =3,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =3, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 		
 				elif 140<=exp+10:
-					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =4,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =4, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 			
 				else:
-					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 , created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 		
 				cursor.execute(update_user_achievement_sql)
 				

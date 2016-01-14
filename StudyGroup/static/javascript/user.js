@@ -51,6 +51,10 @@ var ans;
 	            Cookies.remove('user_id');
 	            window.location = '/';
             }
+            function gotoinf(){
+            	userid = Cookies.get("user_id");
+            	window.location = '/user/' + user_id;
+            }
             
 
             function showMission() {
