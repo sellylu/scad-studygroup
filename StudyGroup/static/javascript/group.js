@@ -398,9 +398,11 @@ function showThoughts(group_id,replied) {
 	var output = newThought_str + '<div class="panel-group">';
 
 	$.get('/get_group_thoughts/' + group_id + '/', function(data) {
+		alert(data);
 		data = data.split(";");
-		var tmp_str = '<ul class="list-group">';
 		for (var i = 0; i < data.length - 1; i++) {
+			var tmp_str = '<ul class="list-group">';
+		
 			tmp = data[i].split(',');
 			var thought = {
 				'no': tmp[0],
@@ -428,6 +430,7 @@ function showThoughts(group_id,replied) {
 					'creator': tmp[j + 2],
 					'creator_pic': tmp[j + 3]
 				};
+				
 				tmp_str += '<li class="list-group-item"><div class="row"><div class="col-md-1"><img src="' + obj.creator_pic + '" class="img-thumbnail"></div>'
 					+ '<div class="col-md-11"><div class="reply-info">' + obj.creator + ' / ' + obj.date + '</div>'
 					+ '<div class="reply-content">' + obj.content + '</div></div></div></li>';
