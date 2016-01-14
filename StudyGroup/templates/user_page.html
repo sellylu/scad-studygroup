@@ -136,12 +136,10 @@
 	                    if(alltime == 0)
 		                    perc = 100;
 
-
-	                    var img = '<img src="{% static "images/logo.jpg" %}" class="group_img col-md-2"></img>';
-                        var name = '<a href="/group/{{ page_data.group_id }}" class="col-md-10"><h4 align="center">{{ page_data.group_name }}</h4></a>';
+                        var name = '<a href="/group/{{ page_data.group_id }}" class="col-md-12"><h4 align="center">{{ page_data.group_name }}</h4></a>';
                         var info = '<p align="center">{{ page_data.intro }}</p>';
 						var progress = '<div class="progress"><div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: ' + perc + '%"></div></div>'
-	                    groups += '<div class="list-group-item row">' + img + name + info + progress + '</div>';
+	                    groups += '<div class="list-group-item row">' + name + info + progress + '</div>';
 
                     {% endfor %}
 	                $('#myContent').append('<div class="list-group">' + groups + '</div>');
