@@ -56,19 +56,19 @@ def index(request):
 				print('ff')
 
 				if 15<=exp+10 <= 49:
-					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =1,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 			
 				elif 50<=exp+10 <= 89:
-					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =2,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =2, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 			
 				elif 90<=exp+10 <= 139:
-					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =3,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =3, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 		
 				elif 140<=exp+10:
-					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =4,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,level =4, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 			
 				else:
-					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 ,post_int = post_int +1, created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
+					update_user_achievement_sql = "UPDATE  user SET exp = exp + 10 , created_achieve=1, join_group = '%s' WHERE no = '%d' " %(user_join_group,user_no)
 		
 				cursor.execute(update_user_achievement_sql)
 				
@@ -80,7 +80,7 @@ def index(request):
 				print('hh')
 
 		# login
-		elif 'user_id' in request.POST:
+		elif 'user_email' in request.POST:
 			id = request.POST['user_id']
 			email = request.POST['user_email']
 			name = request.POST['user_name']
@@ -96,6 +96,18 @@ def index(request):
 			else:
 				updatesql = "UPDATE  user SET login_cnt = login_cnt + 1 WHERE user_id = '%s'" % (id)
 				cursor2.execute(updatesql)
+			return HttpResponseRedirect("/")
+
+		# store user large picture
+		elif 'user_pic_large' in request.POST:
+			print('fff')
+			id = request.POST['user_id']
+			pic_large = request.POST['user_pic_large']
+			cursor = connection.cursor()
+			
+			updatesql = "UPDATE  user SET pic_large = '%s' WHERE user_id = '%s'" % (pic_large,id)
+			cursor.execute(updatesql)
+			print(pic_large)
 			return HttpResponseRedirect("/")
 	
 	if request.method == 'GET':
@@ -494,12 +506,13 @@ def post_mission(request):
 		ranint = random.randint(1,100)
 
 		choose_person = ranint % len(name_list)
-		get_choosed_member_user_id = "SELECT user_id FROM  user WHERE name = '%s'" % name_list[choose_person]
+		get_choosed_member_user_id = "SELECT pic_large FROM  user WHERE name = '%s'" % name_list[choose_person]
 		cursor.execute(get_choosed_member_user_id)
 
 		#question_url is the question
 		#ans_name is the ans
-		question_user_id = cursor.fetchone()[0]
+		question_pic = cursor.fetchone()[0]
+		print(question_pic)
 		ans_name = name_list[choose_person]
 		name_list_string = ''
 		for a in name_list:
@@ -510,7 +523,7 @@ def post_mission(request):
 		t = time.time()
 		created_time = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d-%h%m%s')
 
-		insert_mission_sql = "INSERT INTO mission(question_user_id,question_name,ans,time) VALUES ('%s','%s','%s','%s')" % (question_user_id,name_list_string,ans_name,t)
+		insert_mission_sql = "INSERT INTO mission(question_pic,question_name,ans,time) VALUES ('%s','%s','%s','%s')" % (question_pic,name_list_string,ans_name,t)
 		cursor.execute(insert_mission_sql)
 
 		print('ffff' )
@@ -532,7 +545,7 @@ def post_mission(request):
 			update_user_mission = "UPDATE  user SET mission = '%s' WHERE no ='%d'" % (tmp,int(m))
 			cursor.execute(update_user_mission)
 
-		return HttpResponse("hello")
+	return HttpResponse("hello")
 
 
 def get_mission(request,user_id):

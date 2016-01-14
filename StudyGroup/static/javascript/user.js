@@ -6,13 +6,13 @@ var ans;
 		function creategroup_submit() {
     			check_group_name = $('#group_name').val();
 			    check_group_intro = $('#intro').val();
-	            check_time = $('#finished_time_date').val();
+	            check_time = $('#datapicker').val();
 	            nosubmit = 0;
 	            if(check_time == '') {
-		            $('#finished_time_date').attr('style','border: 1px solid red');
+		            $('#datapicker').attr('style','border: 1px solid red');
 		            nosubmit =1;
 	            } else {
-		            $('#finished_time_date').removeAttr('style');
+		            $('#datapicker').removeAttr('style');
 	            }
 	            if(check_group_intro =='') {
 		            $('#introdiv').attr('class','form-group has-error');
@@ -31,7 +31,7 @@ var ans;
 	            creator_id = Cookies.get('user_id');
 	            group_name = document.getElementById("group_name").value;
 	            intro = document.getElementById("intro").value;
-	            finished_time = document.getElementById("finished_time_date").value;
+	            finished_time = document.getElementById("datapicker").value;
 
 	            if(document.getElementById("private_op1").checked) {
 		            private = 0;
@@ -50,6 +50,10 @@ var ans;
             function logout() {
 	            Cookies.remove('user_id');
 	            window.location = '/';
+            }
+            function gotoinf(){
+            	userid = Cookies.get("user_id");
+            	window.location = '/user/' + user_id;
             }
             
 
@@ -84,13 +88,15 @@ var ans;
 				$.get(str, function(data){
 
 					tmp = data.split(';');
-					user_id = tmp[0];
+					user_pic = tmp[0];
 
-					user_pic = 'http://graph.facebook.com/' + user_id + '/picture?type=large';
+					// user_pic = 'http://graph.facebook.com/' + user_id + '/picture?type=large';
+					
 		            img = $('<img/>', {
 		                'class': 'achievement',
 		                src: user_pic,
-		                width: 200
+		                width: 300,
+		                height:300
 		            });
 					
 					name_list = tmp[1].split(',');
@@ -100,15 +106,15 @@ var ans;
 		            
 					ans = tmp[2];
 
-
-		        }).then(function () {
 		            div = $('<div/>', {
 		                'class': 'nameChecking'
 		            }).css({
 		            	'text-align': 'center'
+
 		            }).html('<p id="question">Who is this?</p><p>' + name +'</p>').prepend(img);
 
 		            $('#name_checking_div').append(div);
+
 		        });
 			}
 

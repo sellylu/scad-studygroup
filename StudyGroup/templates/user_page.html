@@ -25,6 +25,7 @@
         <script type="text/javascript">
         	
             $(document).ready(function() {
+            	$('#datepicker').datepicker({dateFormat:'yy-mm-dd', changeMonth:true, changeYear:true});
             	user_id = Cookies.get('user_id');
             	check_mail_init(user_id);
              	showGroup();
@@ -163,7 +164,7 @@
 						<li role="presentation"><a href="#" onclick="logout();">Log Out</a></li>
 					</ul>
 					<button type="button" class="btn btn-primary navbar-btn navbar-right" id="create_group_button" data-toggle="modal" data-target="#create_group_Modal">Create Group</button>
-					<button type="button" width='100px' class="btn btn-primary navbar-btn navbar-left" id="show_mail_button" style="display:none;">You have a new mail.</button>
+					<button type="button" width='100px' class="btn btn-primary navbar-btn navbar-left" id="show_mail_button" style="display:none;" onclick="gotoinf()">You have a new mail.</button>
 
 				</div>
             </div>
@@ -233,7 +234,7 @@
 							<div id="timediv" class="col-md-4">
 								<label>結束時間</label>
 								<div>
-									<input id="finished_time_date" type="date">
+									<input id="datepicker" type="date">
 								</div>
 							</div>
 						</div>
