@@ -719,7 +719,7 @@ def check_mail(request,user_id):
 @csrf_exempt
 def mission_complete(request,user_id):
 	mission_no = request.POST['mission_no']
-	correct = request.POST['correct']
+	correct = int(request.POST['correct'])
 
 	get_user_data_sql = "SELECT exp,mission FROM user WHERE user_id = '%s'" % (user_id)
 	cursor = connection.cursor()
@@ -727,14 +727,14 @@ def mission_complete(request,user_id):
 	data = cursor.fetchone()
 	if correct == 1:	# correct answer
 		exp = data[0]
-
-		if 15<=exp+1 <= 49:
+		print("i am herei am herei am herei am here")
+		if 15<=exp+5 <= 49:
 			update_user_achievement_sql = "UPDATE user SET exp = exp + 5, level = 1 WHERE user_id = '%s'" % (user_id)
-		elif 50<=exp+1 <= 89:
+		elif 50<=exp+5 <= 89:
 			update_user_achievement_sql = "UPDATE user SET exp = exp + 5, level = 2 WHERE user_id = '%s'" % (user_id)
-		elif 90<=exp+1 <= 139:
+		elif 90<=exp+5 <= 139:
 			update_user_achievement_sql = "UPDATE user SET exp = exp + 5, level = 3 WHERE user_id = '%s'" % (user_id)
-		elif 140<=exp+1 :
+		elif 140<=exp+5 :
 			update_user_achievement_sql = "UPDATE user SET exp = exp + 5, level = 4 WHERE user_id = '%s'" % (user_id)
 		else:
 			update_user_achievement_sql = "UPDATE user SET exp = exp + 5 WHERE user_id = '%s'" % (user_id)
