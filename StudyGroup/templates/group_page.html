@@ -148,7 +148,7 @@
 
 		                <button id="join_group_btn" class="btn btn-lg btn-success" onclick="joinGroup('{{ group_page_data.group_id }}');" >JOIN</button>
 
-			            <button type="button" class="btn btn-primary member-btn" id="send_mail_button" data-toggle="modal" data-target="#send_mail_Modal">Send Mail</button>
+			            <button type="button" class="btn btn-primary member-btn" id="send_mail_button" data-toggle="modal" data-target="#send_mail_Modal">Broadcast</button>
 			        </div>
 		        </div>
 	            <div id="page-content-wrapper">
@@ -186,7 +186,7 @@
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary" onclick="send_mail_submit('{{ group_page_data.group_id }}')">Create</button>
+						<button type="button" class="btn btn-primary" onclick="send_mail_submit('{{ group_page_data.group_id }}')">Send</button>
 					</div>
 				</div>
 			</div>
