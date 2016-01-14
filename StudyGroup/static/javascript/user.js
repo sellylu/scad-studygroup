@@ -145,6 +145,7 @@ var ans;
 				$.post(str, {user_id: user_id, mission_no: mission_no, correct: correct});								
 				parent.$.fancybox.close();	
 				$('#'+mission_no).remove();
+				showMission();
 			}
 
 
