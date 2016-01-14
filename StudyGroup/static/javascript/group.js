@@ -155,7 +155,7 @@ function showNews(group_id) {
 		    news += '<tr onclick="displayContent(' + i + ')"><td>' + news_date + '</td><td>' + news_title + '</td></tr>' + '<tr class="news_content" id=' + i + '><td colspan="2">' + news_content + '</td></tr>';
 		}
 		  
-		$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>CONTENT</td></tr></thead><tbody>' + news + '</tbody></table>');
+		$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>TITLE</td></tr></thead><tbody>' + news + '</tbody></table>');
 		console.log(data);
 		checkMember();
 	});
