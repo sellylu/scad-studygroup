@@ -215,10 +215,6 @@ function displayContent(id) {
 // Schedule Tab
 function showSchedule(group_id) {
 	$('#myContent').empty();
-	if(member)
-		$('.fc-day').css('cursor','pointer');
-	else
-		$('.fc-day').css('cursor','default');
 	
 	var calendarurl = '/group/' + group_id + '/calendar';
 	var div = $('<div/>', {id: 'calendar'});
