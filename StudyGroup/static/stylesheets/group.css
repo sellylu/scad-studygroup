@@ -12,6 +12,10 @@
   height: 200px;
 }
 
+.fs-day {
+  cursor: pointer;
+}
+
 /* line 40, ../sass/styles.scss */
 .photos-padding {
   margin-top: -21px;

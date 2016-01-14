@@ -79,7 +79,7 @@
 						<li role="presentation" class="active"><a href="#" onclick="showNews('{{group_page_data.group_id}}')">News</a></li>
 						<li role="presentation"><a href="#" onclick="showSchedule('{{group_page_data.group_id}}')">Schedule</a></li>
 						<li role="presentation"><a href="#" onclick="showMaterials('{{group_page_data.group_id}}')">Materials</a></li>
-						<li role="presentation"><a href="#" onclick="showThoughts('{{ group_page_data.group_id }}')">Thoughts</a></li>
+						<li role="presentation"><a href="#" onclick="showThoughts('{{ group_page_data.group_id }}',-1)">Thoughts</a></li>
 						<li role="presentation"><a href="#" onclick="Group_Member_inf('{{ group_page_data.group_id }}');">Members</a></li>
 					</ul>
 					<button type="button" width='100px' class="btn btn-primary navbar-btn navbar-left" id="show_mail_button" style="display:none;" onclick="gotoinf()">You have a new mail.</button>
@@ -191,6 +191,8 @@
 				</div>
 			</div>
 		</div>
+
+
         <!-- Add News Modal -->
 		<div id="add_news_Modal" class="modal fade" role="dialog">
 			<div class="modal-dialog">
@@ -211,6 +213,7 @@
 							<script>
 								$('#add_news_Modal').on('click', function() {
 									nic.findEditor("news_content").remove();
+									$('#news_content').val('');
 								});
 
 							</script>

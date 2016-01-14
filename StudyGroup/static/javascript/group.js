@@ -93,7 +93,10 @@ function showprogress(created_time,finish_time){
 }
 
 // Create Group
+
 function creategroup_submit() {
+
+	date = Date.now();
     check_group_name = $('#group_name').val();
     check_group_intro = $('#intro').val();
 	check_time = $('#datepicker').val();
@@ -104,6 +107,14 @@ function creategroup_submit() {
 	} else {
 		$('#datepicker').removeAttr('style');
 	}
+
+	if(check_time - date < 0){
+		$('#datepicker').attr('style','border: 1px solid red');
+		nosubmit =1;
+	} else {
+		$('#datepicker').removeAttr('style');
+	}
+
 	if(check_group_intro =='') {
 		$('#introdiv').attr('class','form-group has-error');
 		nosubmit =1;
@@ -126,7 +137,6 @@ function creategroup_submit() {
 	} else {
 		private = 1;
 	}
-	date = Date.now();
 	var group_id = user_id + date;
 	member_limit = parseInt(document.getElementsByName("member_limit")[0].value);
 	
@@ -204,6 +214,10 @@ function displayContent(id) {
 // Schedule Tab
 function showSchedule(group_id) {
 	$('#myContent').empty();
+	if(member)
+		$('.fc-day').css('cursor','pointer');
+	else
+		$('.fc-day').css('cursor','default');
 	
 	var calendarurl = '/group/' + group_id + '/calendar';
 	var div = $('<div/>', {id: 'calendar'});
@@ -228,6 +242,7 @@ function showSchedule(group_id) {
 								},
 								
 								eventClick: function(calEvent, jsEvent, view) {
+								if(member){
 								var c = confirm('Delete it?');
 								if(c==true){
 								
@@ -248,7 +263,7 @@ function showSchedule(group_id) {
 																 });
 								
 								
-								
+								}
 								}
 								},
 								
@@ -342,7 +357,7 @@ function add_materials(group_id) {
 }
 
 // Thought Tab
-function showThoughts(group_id) {
+function showThoughts(group_id,replied) {
 	$('#myContent').empty();
 
 	var newThought_str = '<button class="btn btn-success member-btn" data-toggle="modal" data-target="#new_thoughts_Modal" style="width: auto"><i class="glyphicon glyphicon-plus"/>New Thought</button><br class="space">';
@@ -362,9 +377,16 @@ function showThoughts(group_id) {
 				'creator': tmp[4]
 			};
 			reply_num = (tmp.length - 5)/4;
-			output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + thought.no + '" data-toggle="collapse">'
+			if(replied == thought.no){
+				output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + thought.no + '" data-toggle="collapse">'
+				+ thought.title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + thought.date + ' by ' + thought.creator + '</div><div class="col-md-4" align="right">Replied by ' + reply_num + ' people.</div></div></div>'
+				+ '<div class="panel-collapse collapse in" id="t' + thought.no + '">';
+			}else{
+				output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + thought.no + '" data-toggle="collapse">'
 				+ thought.title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + thought.date + ' by ' + thought.creator + '</div><div class="col-md-4" align="right">Replied by ' + reply_num + ' people.</div></div></div>'
 				+ '<div class="panel-collapse collapse" id="t' + thought.no + '">';
+			
+			}
 			output += '<div class="panel-body">' + thought.content + '</div>';
 			for (var j = 5; j < tmp.length; j += 4) {
 				var obj = {
@@ -415,7 +437,7 @@ function postReply(group_id, thought_id) {
 
 	$.post(url, {content: content, thought_id: thought_id, creator_id: user_id})
 		.then(function () {
-			showThoughts(group_id);
+			showThoughts(group_id,thought_id);
 	});
 }
 
@@ -451,7 +473,7 @@ function postThought(group_id) {
 		.then(function () {
 			
 			$('#new_thoughts_Modal').modal('hide');
-			showThoughts(group_id);
+			showThoughts(group_id,-1);
 	});
 }
 
