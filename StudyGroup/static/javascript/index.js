@@ -64,18 +64,27 @@ function logout(){
 
 function saveUserInfo() {
 
-	FB.api('/me',{"fields": "name, email, picture","type":"large"}, function(response) {
-		   if(response && !response.error) {
-
+	FB.api('/me',{"fields": "name, email, picture"}, function(response) {
+           if(response && !response.error) {
                $.post("/",{
                    user_id : response.id, user_name: response.name, user_email: response.email, user_pic: response.picture.data.url})
                    .then(function(){
-						 adjustCSS();
-						 Cookies.set('user_id',response.id);
-                         appendMyGroup();
-						 });
+                         adjustCSS();
+                         Cookies.set('user_id',response.id);
+
+                         id = response.id;
+                         FB.api('/me/picture', 'GET', {"type":"large"}, function(response) {
+                            if(response && !response.error) {
+                                $.post("/",{
+                                    user_id: id, user_pic_large: response.data.url
+                                });
+                            }                  
+                        });
+                        
+                        appendMyGroup();
+                    });
             }
-		});
+    });
 }
 
 function adjustCSS() {

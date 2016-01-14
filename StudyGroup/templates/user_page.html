@@ -25,6 +25,7 @@
         <script type="text/javascript">
         	
             $(document).ready(function() {
+            	$('#datepicker').datepicker({dateFormat:'yy-mm-dd', changeMonth:true, changeYear:true});
             	user_id = Cookies.get('user_id');
             	check_mail_init(user_id);
              	showGroup();
@@ -233,7 +234,7 @@
 							<div id="timediv" class="col-md-4">
 								<label>結束時間</label>
 								<div>
-									<input id="finished_time_date" type="date">
+									<input id="datepicker" type="date">
 								</div>
 							</div>
 						</div>
