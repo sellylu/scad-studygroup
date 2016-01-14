@@ -141,11 +141,14 @@ var ans;
 				}
 
 				user_id = Cookies.get('user_id');
- 	            str = '/mission_complete/' + user_id + '/';					
-				$.post(str, {user_id: user_id, mission_no: mission_no, correct: correct});								
+					
 				parent.$.fancybox.close();	
 				$('#'+mission_no).remove();
-				showMission();
+ 	            str = '/mission_complete/' + user_id + '/';					
+				$.post(str, {user_id: user_id, mission_no: mission_no, correct: correct}).then(function(){
+					showMission();
+				});							
+				
 			}
 
 
