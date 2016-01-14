@@ -81,7 +81,7 @@ var ans;
 						var mission ='';
 						for(var i = 0; i < mission_list.length; i++) {
 							mission_no = mission_list[i];
-							mission = '<div id="' + mission_no + '"><a class="missionBox" href="#name_checking_div" onclick="renderMission(' + mission_no + ')"><div class="list-group-item row"><h4 align="center">Mission from System</h4></div></a></div>';
+							mission += '<div id="' + mission_no + '"><a class="missionBox" href="#name_checking_div" onclick="renderMission(' + mission_no + ')"><div class="list-group-item row"><h4 align="center">Mission from System</h4></div></a></div>';
 						}
 
 						$('#myContent').append(mission);
