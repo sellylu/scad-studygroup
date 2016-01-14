@@ -53,7 +53,9 @@ var ans;
             }
             function gotoinf(){
             	userid = Cookies.get("user_id");
+            	Cookies.set("mail",1);
             	window.location = '/user/' + user_id;
+
             }
             
 

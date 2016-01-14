@@ -20,6 +20,7 @@
 
         <script type="text/javascript">
             $(document).ready(function(){
+            	
 				//document.getElementById('finished_time_date').valueAsDate = new Date();
 	            $('#datepicker').datepicker({dateFormat:'yy-mm-dd', changeMonth:true, changeYear:true});
 	            	checkShowLoginDiv();
@@ -29,7 +30,9 @@
 
             function gotoinf(){
             	userid = Cookies.get("user_id");
+            	Cookies.set("mail",1);
             	window.location = '/user/' + user_id;
+            	
             }
 
 
