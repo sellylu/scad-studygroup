@@ -398,7 +398,6 @@ function showThoughts(group_id,replied) {
 	var output = newThought_str + '<div class="panel-group">';
 
 	$.get('/get_group_thoughts/' + group_id + '/', function(data) {
-		alert(data);
 		data = data.split(";");
 		for (var i = 0; i < data.length - 1; i++) {
 			var tmp_str = '<ul class="list-group">';
