@@ -107,8 +107,8 @@ function creategroup_submit() {
 	} else {
 		$('#datepicker').removeAttr('style');
 	}
-
-	if(check_time - date < 0){
+	var check = new Date(check_time);
+	if(check.valueOf() - date < 0){
 		$('#datepicker').attr('style','border: 1px solid red');
 		nosubmit =1;
 	} else {

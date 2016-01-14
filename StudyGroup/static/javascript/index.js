@@ -10,6 +10,8 @@ function checkShowLoginDiv() {
 }
 
 function creategroup_submit() {
+
+    date = Date.now();
     check_group_name = $('#group_name').val();
     check_group_intro = $('#intro').val();
 	check_time = $('#datepicker').val();
@@ -20,6 +22,14 @@ function creategroup_submit() {
 	} else {
 		$('#datepicker').removeAttr('style');
 	}
+
+    var check = new Date(check_time);
+    if(check.valueOf() - date < 0){ 
+        $('#datepicker').attr('style','border: 1px solid red');
+        nosubmit =1;
+    } else {
+        $('#datepicker').removeAttr('style');
+    }
 	if(check_group_intro =='') {
 		$('#introdiv').attr('class','form-group has-error');
 		nosubmit =1;
@@ -27,10 +37,10 @@ function creategroup_submit() {
 		$('#introdiv').attr('class','form-group');
 	}
 	if(check_group_name=='') {
-		$('#namediv').attr('class','form-group has-error');
+		$('#creatednamediv').attr('class','form-group has-error');
 		nosubmit =1;
     } else {
-		$('#namediv').attr('class','form-group');
+		$('#creatednamediv').attr('class','form-group');
 	}
 	if(nosubmit==1)return false;
 
@@ -43,7 +53,6 @@ function creategroup_submit() {
     }else{
         private = 1;
     }
-    date = Date.now();
     group_id = creator_id + date;
 	member_limit = parseInt(document.getElementsByName("member_limit")[0].value);
 
