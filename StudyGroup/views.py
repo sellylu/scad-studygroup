@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseRedirect
@@ -263,9 +264,14 @@ def getcalendarevent(request,group_id):
 	cursor.execute(getcalendarsql)
 	date = cursor.fetchall()
 	returnstr = ''
+	schedule = list()
 	for a in date:
-		returnstr = returnstr + a[1] +';'
-	return HttpResponse(returnstr)
+		schedule_dict = {'event': a[1]}
+		schedule.append(schedule_dict)
+	tmp = dict()
+	tmp['schedule'] = schedule
+	print(tmp)
+	return JsonResponse(tmp)
 
 
 @csrf_exempt
@@ -299,10 +305,18 @@ def get_group_news(request,group_id):
 	get_group_newssql = "SELECT * FROM news WHERE group_id ='%s' ORDER BY no DESC" % (group_id);
 	cursor.execute(get_group_newssql)
 	data = cursor.fetchall()
-	news_str = ''
-	for news in data:
-		news_str = news_str + news[2]+',' +news[3] + ',' + news[4] + ';'
-	return HttpResponse(news_str)
+	news = list()
+	print("ya")
+	for new in data:
+		news_dict = dict()
+		news_dict['created_time'] = new[2]
+		news_dict['title'] = new[3]
+		news_dict['content'] = new[4]
+		news.append(news_dict)
+	tmp = dict()
+	tmp['news'] = news
+	print(tmp)
+	return JsonResponse(tmp)
 
 
 @csrf_exempt
@@ -328,19 +342,26 @@ def get_group_materials(request,group_id):
 	cursor.execute(get_group_materialssql)
 	data = cursor.fetchall()
 
-	post_content = ''
+	post = list()
 	if data:
 		for material in data:
-			get_user_sql = "SELECT name FROM  user WHERE user_id = '%s'" % material[6]
+			post_dict = dict()
+			get_user_sql = "SELECT name FROM user WHERE user_id = '%s'" % material[6]
 			cursor.execute(get_user_sql)
 			data1 = cursor.fetchone()
+			post_dict['no'] = material[0]
+			post_dict['created_time'] = material[3]
+			post_dict['content'] = material[4]
+			post_dict['title'] = material[5]
 			if data1:
-				post_content += str(material[0]) + ',' + material[3] + ',' + material[4] + ',' + material[5] + ',' + data1[0] + ';'
+				post_dict['creator'] = data1[0]
 			else:
-				post_content += str(material[0]) + ',' + material[3] + ',' + material[4] + ',' + material[5] + ',0;'
+				post_dict['creator'] = 0
+			post.append(post_dict)
 
-	
-	return HttpResponse(post_content)
+	tmp = dict()
+	tmp['material'] = post
+	return JsonResponse(tmp)
 
 
 @csrf_exempt
@@ -574,35 +595,34 @@ def get_group_thoughts(request, group_id):
 	get_thoughts_sql = "SELECT * FROM thought WHERE group_id ='%s' ORDER BY no DESC" % (group_id)
 	cursor.execute(get_thoughts_sql)
 	data = cursor.fetchall()
-	thought_str = ''
+	thoughts = list()
 	if data:
 		for thought in data:
+			thought_dict = dict()
 			get_user_sql = "SELECT name FROM  user WHERE user_id = '%s'" % thought[5]
 			cursor.execute(get_user_sql)
 			data4 = cursor.fetchone()
-			thought_str += str(thought[0]) + ',' + thought[2] + ',' + thought[3] + ',' + thought[4] + ',' + data4[0]
+			thought_dict = {'no': thought[0], 'created_time': thought[2], 'title': thought[3], 'content': thought[4], 'creator': data4[0]}
+
 			get_reply_sql = "SELECT * FROM thought_reply WHERE thought_id ='%d' ORDER BY no DESC" % (int(thought[0]))
 			cursor.execute(get_reply_sql)
 			data2 = cursor.fetchall()
-
+			replies = list()
 			if data2:
-				print("haha")
-				for i, reply in enumerate(data2):
+				for reply in data2:
+					reply_dict = dict()
 					get_user_sql = "SELECT name,pic FROM  user WHERE user_id = '%s'" % reply[4]
 					cursor.execute(get_user_sql)
 					data3 = cursor.fetchone()
-					if data3:
-						thought_str += ',' + reply[2] + ',' + reply[3] + ',' + data3[0] + ',' + data3[1]
-					else:
-						thought_str += ',' + reply[2] + ',' + reply[3] + ',0,0'
-				thought_str += ';'
-			else:
-				print("qqqqqqqqqq")
-				thought_str += ';'
-		
-		return HttpResponse(thought_str)
-	else:
-		return HttpResponse("")
+					reply_dict = {'created_time': reply[2], 'content': reply[3], 'creator': data3[0], 'creator_pic': data3[1]}
+					replies.append(reply_dict)
+			thought_dict['reply'] = replies
+			thoughts.append(thought_dict)
+	tmp = dict()
+	tmp['thought'] = thoughts
+	print(tmp)
+	return JsonResponse(tmp)
+
 
 
 @csrf_exempt

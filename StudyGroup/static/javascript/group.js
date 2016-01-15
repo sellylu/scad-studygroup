@@ -59,7 +59,7 @@ function send_mail_submit(group_id) {
 	if(nosubmit==1)return false;
 
 	title = document.getElementById("title").value;
-	content = $("#content").val();
+	content = $("#content").val().replace(/\n/g,"<br>");
 
 	str = '/send_mail/' + group_id + '/';
 	$.post( str, { title : title,  content : content, creator_id: user_id})
@@ -130,7 +130,7 @@ function creategroup_submit() {
 	if(nosubmit==1)return false;
 
 	group_name = document.getElementById("group_name").value;
-	content = $('#intro').val();
+	content = $('#intro').val().replace(/\n/g,"<br>");
 	finished_time = document.getElementById("datepicker").value;
 	if(document.getElementById("private_op1").checked) {
 		private = 0;
@@ -150,20 +150,14 @@ function creategroup_submit() {
 // News Tab
 function showNews(group_id) {
 
-	
 	$('#myContent').empty();
 	$('#myContent').append('<button type="button" class="btn btn-primary admin-btn" id="add_news_button" data-toggle="modal" data-target="#add_news_Modal">Add News</button>');
 	var str = '/get_group_news/' + group_id;
 	
 	$.get(str, function(data){
-		var tmp = data.split(";");
 		var news = '';
-		for(var i = 0; i < tmp.length-1; i++) {
-			tmp2 = tmp[i].split(',');
-		    news_date = tmp2[0];
-		    news_title = tmp2[1];
-		    news_content = tmp2[2];
-		    news += '<tr onclick="displayContent(' + i + ')"><td>' + news_date + '</td><td>' + news_title + '</td></tr>' + '<tr class="news_content" id=' + i + '><td colspan="2">' + news_content + '</td></tr>';
+		for(var i = 0; i < data.news.length; i++) {
+		    news += '<tr onclick="displayContent(' + i + ')"><td>' + data.news[i].created_time + '</td><td>' + data.news[i].title + '</td></tr>' + '<tr class="news_content" id=' + i + '><td colspan="2">' + data.news[i].content + '</td></tr>';
 		}
 		  
 		$('#myContent').append('<table class="table table-striped table-hover"><thead><tr><td>DATE</td><td>TITLE</td></tr></thead><tbody>' + news + '</tbody></table>');
@@ -193,8 +187,8 @@ function add_group_news(group_id) {
 	if(nosubmit==1)return false;
 	
 	title = document.getElementById("news_title").value;
-	content = document.getElementById("news_content").value;
-	
+	content = document.getElementById("news_content").value.replace(/\n/g,"<br>");
+
 	url = '/post_group_news/' + group_id +'/';
 	$.post( url, {title : title, content: content})
 	.then(function () {
@@ -221,67 +215,52 @@ function showSchedule(group_id) {
 	
 	$('#myContent').append(div);
 	$('#calendar').fullCalendar({
-								// put your options and callbacks here
-								events: function( start, end, callback ) {
-								$.get(calendarurl, function(data){
-									  
-									  
-									  tmp = data.split(';');
-									  for(var i=0;i<tmp.length-1;i++){
-									  tmp2 = tmp[i].split(',');
-									  event_title = tmp2[0];
-									  event_start = tmp2[1];
-									  myevent = {title: event_title,start: event_start,allDay:true};
-									  $('#calendar').fullCalendar( 'renderEvent', myevent);
-									  }
-									  });
-								
-								},
-								
-								eventClick: function(calEvent, jsEvent, view) {
+		// put your options and callbacks here
+		events: function( start, end, callback ) {
+			$.get(calendarurl, function(data){
+				for(var i=0; i< data.schedule.length; i++){
+					var tmp = data.schedule[i].event.split(',');
+					event_title = tmp[0];
+					event_start = tmp[1];
+					myevent = {title: event_title,start: event_start,allDay:true};
+					$('#calendar').fullCalendar( 'renderEvent', myevent);
+				}
+			});
 
+		},
 
+		eventClick: function(calEvent, jsEvent, view) {
+			if(member){
+				var c = confirm('Delete it?');
+				if(c==true){
 
-								
+					title = calEvent.title;
 
-								if(member){
-								var c = confirm('Delete it?');
-								if(c==true){
-								
-								title = calEvent.title;
-								
-								var d = new Date(calEvent.start);
-								var year = d.getFullYear();
-								var month = (d.getMonth()+1);
-								var date = d.getDate();
-								if(month<10) month='0'+month;
-								if(date<10)date='0'+date;
-								var datetime = year + '-' + month + '-' + date;
-								
-								
-								url = '/deletecalendarevent/' + group_id +'/';
-		     	$.post(url, { title:title,start: datetime}).then(function(){
-								showSchedule(group_id);
-				});
-								
-								
-								}
-								}
-								},
-								
-								dayClick: function(date, allDay, jsEvent, view) {
-									
-								
-									if (member) {
-										var d = new Date(date);
-										Cookies.set('dayClickTime', d);
-										$("#schedule_addevent_Modal").modal();
-						
-									}
-								}
-				
+					var d = new Date(calEvent.start);
+					var year = d.getFullYear();
+					var month = (d.getMonth()+1);
+					var date = d.getDate();
+					if(month<10) month='0'+month;
+					if(date<10)date='0'+date;
+					var datetime = year + '-' + month + '-' + date;
+
+					url = '/deletecalendarevent/' + group_id +'/';
+					$.post(url, { title:title,start: datetime}).then(function(){
+						showSchedule(group_id);
+					});
+
+				}
+			}
+		},
+		dayClick: function(date, allDay, jsEvent, view) {
+			if (member) {
+				var d = new Date(date);
+				Cookies.set('dayClickTime', d);
+				$("#schedule_addevent_Modal").modal();
+
+			}
+		}
 	});
-	
 }
 
 
@@ -300,7 +279,8 @@ function add_schedule_event(group_id) {
 	}
 	if(nosubmit==1)return false;
 
-	content = $("#schedule_content").val();
+	content = $("#schedule_content").val().replace(/\n/g,"  ");
+
 	var d = new Date(Cookies.get('dayClickTime'));
 	var year = d.getFullYear();
 	var month = (d.getMonth() + 1);
@@ -330,21 +310,14 @@ function showMaterials(group_id) {
 	var output = newMaterial_str + '<div class="panel-group">';
 
 	$.get('/get_group_materials/' + group_id + '/', function(data) {
+		console.log(data);
 
-		data = data.split(";");
-		for (var i = 0; i < data.length - 1; i++) {
-			tmp = data[i].split(',');
-			var material = {
-				'no': tmp[0],
-				'date': tmp[1],
-				'title': tmp[3],
-				'content': tmp[2],
-				'creator': tmp[4]
-			};
-			output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#m' + material.no + '" data-toggle="collapse">'
-				+ material.title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + material.date + ' by ' + material.creator + '</div></div></div>'
-				+ '<div class="panel-collapse collapse" id="m' + material.no + '">';
-			output += '<div class="panel-body">' + material.content + '</div></div></div>';
+		for (var i = 0; i < data.material.length; i++) {
+
+			output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#m' + data.material[i].no + '" data-toggle="collapse">'
+				+ data.material[i].title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + data.material[i].date + ' by ' + data.material[i].creator + '</div></div></div>'
+				+ '<div class="panel-collapse collapse" id="m' + data.material[i].no + '">';
+			output += '<div class="panel-body">' + data.material[i].content + '</div></div></div>';
 		}
 		output += '</div>';
 		$('#myContent').append(output);
@@ -398,43 +371,28 @@ function showThoughts(group_id,replied) {
 	var output = newThought_str + '<div class="panel-group">';
 
 	$.get('/get_group_thoughts/' + group_id + '/', function(data) {
-		data = data.split(";");
-		for (var i = 0; i < data.length - 1; i++) {
+		for (var i = 0; i < data.thought.length; i++) {
 			var tmp_str = '<ul class="list-group">';
-		
-			tmp = data[i].split(',');
-			var thought = {
-				'no': tmp[0],
-				'date': tmp[1],
-				'title': tmp[2],
-				'content': tmp[3],
-				'creator': tmp[4]
-			};
-			reply_num = (tmp.length - 5)/4;
-			if(replied == thought.no){
-				output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + thought.no + '" data-toggle="collapse">'
-				+ thought.title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + thought.date + ' by ' + thought.creator + '</div><div class="col-md-4" align="right">Replied by ' + reply_num + ' people.</div></div></div>'
-				+ '<div class="panel-collapse collapse in" id="t' + thought.no + '">';
+
+			reply_num = data.thought[i].reply.length;
+			if(replied == data.thought[i].no){
+				output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + data.thought[i].no + '" data-toggle="collapse">'
+				+ data.thought[i].title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + data.thought[i].created_time + ' by ' + data.thought[i].creator + '</div><div class="col-md-4" align="right">Replied by ' + reply_num + ' people.</div></div></div>'
+				+ '<div class="panel-collapse collapse in" id="t' + data.thought[i].no + '">';
 			}else{
-				output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + thought.no + '" data-toggle="collapse">'
-				+ thought.title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + thought.date + ' by ' + thought.creator + '</div><div class="col-md-4" align="right">Replied by ' + reply_num + ' people.</div></div></div>'
-				+ '<div class="panel-collapse collapse" id="t' + thought.no + '">';
+				output += '<div class="panel panel-success thought"><div class="panel-heading"><h4><a href="#t' + data.thought[i].no + '" data-toggle="collapse">'
+				+ data.thought[i].title + '</a></h4><div class="thought-info row"><div class="col-md-8" align="left">Created at: ' + data.thought[i].created_time + ' by ' + data.thought[i].creator + '</div><div class="col-md-4" align="right">Replied by ' + reply_num + ' people.</div></div></div>'
+				+ '<div class="panel-collapse collapse" id="t' + data.thought[i].no + '">';
 			
 			}
-			output += '<div class="panel-body">' + thought.content + '</div>';
-			for (var j = 5; j < tmp.length; j += 4) {
-				var obj = {
-					'date': tmp[j],
-					'content': tmp[j + 1],
-					'creator': tmp[j + 2],
-					'creator_pic': tmp[j + 3]
-				};
-				
+			output += '<div class="panel-body">' + data.thought[i].content + '</div>';
+			for (var j = 0; j < reply_num; j++) {
+				var obj = data.thought[i].reply[j];
 				tmp_str += '<li class="list-group-item"><div class="row"><div class="col-md-1"><img src="' + obj.creator_pic + '" class="img-thumbnail"></div>'
-					+ '<div class="col-md-11"><div class="reply-info">' + obj.creator + ' / ' + obj.date + '</div>'
+					+ '<div class="col-md-11"><div class="reply-info">' + obj.creator + ' / ' + obj.created_time + '</div>'
 					+ '<div class="reply-content">' + obj.content + '</div></div></div></li>';
 			}
-			output += tmp_str + '</ul><div class="panel-footer"><button class="btn btn-default" id="b' + thought.no + '" onclick="showEditor(' + thought.no + ');">Reply</button><div id="e' + thought.no + '" style="display: none;"><textarea id="ta' + thought.no + '" style="width: 800px; height: 100px;"></textarea><br><button class="btn btn-success" onclick="postReply(\'' + group_id + '\', ' + thought.no + ');">Submit</button></div></div></div></div>';
+			output += tmp_str + '</ul><div class="panel-footer"><button class="btn btn-default" id="b' + data.thought[i].no + '" onclick="showEditor(' + data.thought[i].no + ');">Reply</button><div id="e' + data.thought[i].no + '" style="display: none;"><textarea id="ta' + data.thought[i].no + '" style="width: 800px; height: 100px;"></textarea><br><button class="btn btn-success" onclick="postReply(\'' + group_id + '\', ' + data.thought[i].no + ');">Submit</button></div></div></div></div>';
 		}
 		output += '</div>';
 		$('#myContent').append(output);
