@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 import os
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -69,52 +70,12 @@ WSGI_APPLICATION = 'scad.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.mysql',
-		'NAME': 'scad',
-		'USER': 'scad',
-		'PASSWORD': 'scad',
-		'HOST': '140.114.194.9',
-		'PORT': '3306',
-	}
-}
-'''
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.postgresql',
-		'NAME': 'scad',
-		'USER': 'selly',
-		'PASSWORD': 'aya721',
-		'HOST': 'localhost',
-		'PORT': '5432',
-	}
-}
-
-import dj_database_url
-
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.sqlite3',
-		'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-	}
-}
 # Parse database configuration from $DATABASE_URL
-DATABASES['default'] = dj_database_url.config()
+DATABASES = {'default': dj_database_url.config()}
+
 # Enable Connection Pooling (if desired)
 DATABASES['default']['ENGINE'] = 'django_postgrespool'
 
-DATABASES = {
-	'default': {
-		'ENGINE': 'django_postgrespool',
-		'NAME': 'd5u0slu622ocrq',
-		'USER': 'dwkwufjitjpaov',
-		'PASSWORD': 'LyXIcHkBVsiu367SCCCw-ShTRc',
-		'HOST': 'ec2-54-197-247-170.compute-1.amazonaws.com',
-		'PORT': '5432',
-	}
-}
-'''
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
